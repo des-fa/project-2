@@ -20,7 +20,7 @@ router.post('/api/my/entries', authenticateUser('json'), (await import('./contro
 router.get('/api/my/entries', authenticateUser('json'), (await import('./controllers/api/my/entries/index.js')).default)
 router.get('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/show.js')).default)
 router.put('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/update.js')).default)
-// router.delete('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/destroy.js')).default)
+router.delete('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/destroy.js')).default)
 
 // API | MY COMMENTS | AUTH REQUIRED
 // router.post('/api/my/comments', authenticateUser('json'), (await import('./controllers/api/my/comments/create.js')).default)
@@ -28,11 +28,11 @@ router.put('/api/my/entries/:id', authenticateUser('json'), (await import('./con
 // router.delete('/api/my/comments/:id', authenticateUser('json'), (await import('./controllers/api/my/comments/destroy.js')).default)
 
 // API | PUBLIC POSTS | AUTH REQUIRED
-// router.get('/api/public-posts', authenticateUser('json'), (await import('./controllers/api/public-posts/index.js')).default)
-// router.get('/api/public-posts/:id', authenticateUser('json'), (await import('./controllers/api/public-posts/show.js')).default)
+router.get('/api/public-posts', authenticateUser('json'), (await import('./controllers/api/public-posts/index.js')).default)
+router.get('/api/public-posts/:id', authenticateUser('json'), (await import('./controllers/api/public-posts/show.js')).default)
 
 // API | NOT FOUND
-// router.use('/api', (await import('./controllers/api/not-found.js')).default)
+router.use('/api', (await import('./controllers/api/not-found.js')).default)
 
 // PAGES | HOMEPAGE | STATIC
 // router.get('/', (await import('./controllers/pages/home.js')).default)

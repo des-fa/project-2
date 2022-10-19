@@ -22,30 +22,20 @@ model User {
 }
 
 model Entry {
-  id         Int                   @id @default(autoincrement())
-  createdAt  DateTime              @default(now())
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
   mood       String
   gratitude  String
-  user       User                  @relation(fields: [userId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
   userId     Int
-  activities ActivitiesOnEntries[]
+  activities Activity[]
   post       Post?
 }
 
-//Join table for Activities  & Entries
-model ActivitiesOnEntries {
-  entry      Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
-  entryId    Int
-  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  activityId Int
-
-  @@id([entryId, activityId])
-}
-
 model Activity {
-  id       Int                   @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   activity String
-  entries  ActivitiesOnEntries[]
+  entries  Entry[]
 }
 
 model Post {
