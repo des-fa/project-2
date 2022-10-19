@@ -17,9 +17,9 @@ router.put('/api/my/user/settings', authenticateUser('json'), (await import('./c
 
 // API | MY ENTRIES | AUTH REQUIRED
 router.post('/api/my/entries', authenticateUser('json'), (await import('./controllers/api/my/entries/create.js')).default)
-// router.get('/api/my/entries', authenticateUser('json'), (await import('./controllers/api/my/entries/index.js')).default)
-// router.get('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/show.js')).default)
-// router.put('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/update.js')).default)
+router.get('/api/my/entries', authenticateUser('json'), (await import('./controllers/api/my/entries/index.js')).default)
+router.get('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/show.js')).default)
+router.put('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/update.js')).default)
 // router.delete('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/destroy.js')).default)
 
 // API | MY COMMENTS | AUTH REQUIRED

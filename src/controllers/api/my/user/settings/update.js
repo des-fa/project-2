@@ -18,7 +18,7 @@ const updateSchema = yup.object({
       }
     }
   }),
-  username: yup.string().notRequired().min(6, 'Mininum 6 characters').max(15, 'Maximum 15 characters')
+  username: yup.string().notRequired().min(6, 'Minimum 6 characters').max(15, 'Maximum 15 characters')
     .nullable()
     .transform((value) => (value || null))
     .test({
@@ -32,25 +32,6 @@ const updateSchema = yup.object({
         }
       }
     }),
-  // yup.string().when('username', (value) => {
-  //   if (value) {
-  //     return yup
-  //       .string()
-  //       .min(6, 'Username must be more than 6 characters long')
-  //       .max(15, 'Username must be less than 15 characters long')
-  //   }
-  //   return yup
-  //     .string()
-  //     .transform((value, originalValue) => {
-  //       // Convert empty values to null
-  //       if (!value) {
-  //         return null
-  //       }
-  //       return originalValue
-  //     })
-  //     .nullable()
-  //     .optional()
-  // }),
   password: yup.string().test(
     'empty-or-6-characters-check',
     'Password must be at least 6 characters',

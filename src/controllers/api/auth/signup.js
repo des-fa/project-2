@@ -19,7 +19,7 @@ const signupSchema = yup.object({
     }
   }),
   username: yup.string()
-    .min(6, 'Mininum 6 characters')
+    .min(6, 'Minimum 6 characters')
     .max(15, 'Maximum 15 characters')
     .required()
     .test({
@@ -33,7 +33,7 @@ const signupSchema = yup.object({
         }
       }
     }),
-  password: yup.string().min(6).required(),
+  password: yup.string().min(6, 'Minimum 6 characters').required(),
   passwordConfirmation: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match').required(),
   avatar: yup.mixed().required()
 })

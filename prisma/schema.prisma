@@ -22,46 +22,68 @@ model User {
 }
 
 model Entry {
-  id         Int        @id @default(autoincrement())
+  id         Int                   @id @default(autoincrement())
+  createdAt  DateTime              @default(now())
   mood       String
   gratitude  String
-  user       User       @relation(fields: [userId], references: [id])
+  user       User                  @relation(fields: [userId], references: [id])
   userId     Int
-  activities Activity[]
+  activities ActivitiesOnEntries[]
   post       Post?
 }
 
+//Join table for Activities  & Entries
+model ActivitiesOnEntries {
+  entry      Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entryId    Int
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId Int
+
+  @@id([entryId, activityId])
+}
+
 model Activity {
-  id       Int     @id @default(autoincrement())
+  id       Int                   @id @default(autoincrement())
   activity String
-  entries  Entry[]
+  entries  ActivitiesOnEntries[]
 }
 
 model Post {
-  id       Int       @id @default(autoincrement())
+  id       Int           @id @default(autoincrement())
   title    String
   content  String
   tag      String
-  checked  Boolean   @default(false)
-  user     User?     @relation(fields: [userId], references: [id])
+  checked  Boolean       @default(false)
+  user     User?         @relation(fields: [userId], references: [id])
   userId   Int?
-  entry    Entry     @relation(fields: [entryId], references: [id])
-  entryId  Int       @unique
-  tags     Tag[]
+  entry    Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entryId  Int           @unique
+  tags     TagsOnPosts[]
   comments Comment[]
 }
 
+//Join table for Post & Tags
+model TagsOnPosts {
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  Int
+
+  @@id([postId, tagId])
+}
+
 model Tag {
-  id    Int    @id @default(autoincrement())
+  id    Int           @id @default(autoincrement())
   name  String
-  posts Post[]
+  posts TagsOnPosts[]
 }
 
 model Comment {
-  id      Int    @id @default(autoincrement())
-  comment String
-  user    User   @relation(fields: [userId], references: [id])
-  userId  Int
-  post    Post   @relation(fields: [postId], references: [id])
-  postId  Int
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  comment   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
 }
