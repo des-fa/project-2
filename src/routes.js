@@ -23,9 +23,9 @@ router.put('/api/my/entries/:id', authenticateUser('json'), (await import('./con
 router.delete('/api/my/entries/:id', authenticateUser('json'), (await import('./controllers/api/my/entries/destroy.js')).default)
 
 // API | MY COMMENTS | AUTH REQUIRED
-// router.post('/api/my/comments', authenticateUser('json'), (await import('./controllers/api/my/comments/create.js')).default)
-// router.put('/api/my/comments/:id', authenticateUser('json'), (await import('./controllers/api/my/comments/update.js')).default)
-// router.delete('/api/my/comments/:id', authenticateUser('json'), (await import('./controllers/api/my/comments/destroy.js')).default)
+router.post('/api/my/comments', authenticateUser('json'), (await import('./controllers/api/my/comments/create.js')).default)
+router.put('/api/my/comments/:id', authenticateUser('json'), (await import('./controllers/api/my/comments/update.js')).default)
+router.delete('/api/my/comments/:id', authenticateUser('json'), (await import('./controllers/api/my/comments/destroy.js')).default)
 
 // API | PUBLIC POSTS | AUTH REQUIRED
 router.get('/api/public-posts', authenticateUser('json'), (await import('./controllers/api/public-posts/index.js')).default)

@@ -4,7 +4,9 @@ import handleErrors from '../../_helpers/handle-errors.js'
 const controllersApiPublicPostsIndex = async (req, res) => {
   try {
     // Filters
-    const q = req.query.q || ''
+    const postTitle = req.query.postTitle || ''
+    const postTag = req.query.postTag || ''
+    const postUsername = req.query.postUsername || ''
     const orderBy = req.query.orderBy || 'id'
     const sortBy = req.query.sortBy || 'asc'
 
@@ -14,27 +16,46 @@ const controllersApiPublicPostsIndex = async (req, res) => {
     const skip = (page - 1) * take
 
     // Common Where Query
+    const OR = []
     const where = {
-      checked: true,
-      OR: [
-        {
-          title: {
-            contains: q,
-            mode: 'insensitive'
-          }
-        }, {
-          tag: {
-            contains: q,
-            mode: 'insensitive'
-          }
-        }, {
-          user: {
-            username: {
-              contains: q
+      checked: true
+    }
+
+    if (postTitle) {
+      OR.push({
+        title: {
+          contains: postTitle,
+          mode: 'insensitive'
+        }
+      })
+    }
+
+    if (postTag) {
+      OR.push({
+        tags: {
+          some: {
+            name: {
+              contains: postTag,
+              mode: 'insensitive'
             }
           }
         }
-      ]
+      })
+    }
+
+    if (postUsername) {
+      OR.push({
+        user: {
+          username: {
+            contains: postUsername,
+            mode: 'insensitive'
+          }
+        }
+      })
+    }
+
+    if (OR.length > 0) {
+      where.OR = OR
     }
 
     const totalPosts = await prisma.post.count({ where })
@@ -44,6 +65,14 @@ const controllersApiPublicPostsIndex = async (req, res) => {
       where,
       orderBy: {
         [orderBy]: sortBy
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+            avatar: true
+          }
+        }
       }
     })
 

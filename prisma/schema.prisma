@@ -23,7 +23,7 @@ model User {
 
 model Entry {
   id         Int        @id @default(autoincrement())
-  createdAt  DateTime   @default(now())
+  createdAt  DateTime   @default(now()) @db.Date
   mood       String
   gratitude  String
   user       User       @relation(fields: [userId], references: [id])
@@ -34,38 +34,27 @@ model Entry {
 
 model Activity {
   id       Int     @id @default(autoincrement())
-  activity String
+  activity String  @unique
   entries  Entry[]
 }
 
 model Post {
-  id       Int           @id @default(autoincrement())
+  id       Int       @id @default(autoincrement())
   title    String
   content  String
-  tag      String
-  checked  Boolean       @default(false)
-  user     User?         @relation(fields: [userId], references: [id])
+  checked  Boolean   @default(false)
+  user     User?     @relation(fields: [userId], references: [id])
   userId   Int?
-  entry    Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
-  entryId  Int           @unique
-  tags     TagsOnPosts[]
+  entry    Entry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entryId  Int       @unique
+  tags     Tag[]
   comments Comment[]
 }
 
-//Join table for Post & Tags
-model TagsOnPosts {
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId Int
-  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  tagId  Int
-
-  @@id([postId, tagId])
-}
-
 model Tag {
-  id    Int           @id @default(autoincrement())
-  name  String
-  posts TagsOnPosts[]
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  posts Post[]
 }
 
 model Comment {
@@ -76,4 +65,16 @@ model Comment {
   userId    Int
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int
+}
+
+//test models
+model TableA {
+  id      Int      @id @default(autoincrement())
+  tableBs TableB[]
+}
+
+model TableB {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  tableAs TableA[]
 }

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Entry" ALTER COLUMN "createdAt" SET DATA TYPE DATE;

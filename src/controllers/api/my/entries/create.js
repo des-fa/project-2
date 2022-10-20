@@ -8,15 +8,19 @@ const createSchema = yup.object({
   gratitude: yup.string().required(),
   // using array of objects
   activities: yup.array().of(yup.object({
-    activity: yup.string().required()
+    activity: yup.string().transform((value) => value.toUpperCase()).required()
   })).required(),
   // using array of strings
   // activities: yup.array().of(yup.string().required()),
   post: yup.object({
     title: yup.string().required(),
     content: yup.string().required(),
-    tag: yup.string().required(),
-    checked: yup.boolean().transform((value) => (!!value))
+    checked: yup.boolean().transform((value) => (!!value)),
+    tags: yup.array().of(
+      yup.object({
+        name: yup.string().transform((value) => value.toUpperCase()).required()
+      })
+    ).min(1).required()
   }).default(undefined)
 })
 
@@ -49,7 +53,10 @@ const controllersApiMyEntriesCreate = async (req, res) => {
         // }
         // using array of objects
         activities: {
-          create: verifiedData.activities
+          connectOrCreate: verifiedData.activities.map((activity) => ({
+            where: activity,
+            create: activity
+          }))
         },
         // using array of strings
         // activities: {
@@ -58,12 +65,29 @@ const controllersApiMyEntriesCreate = async (req, res) => {
         //   }))
         // },
         post: {
-          create: verifiedData.post
+          create: verifiedData.post ? {
+            ...verifiedData.post,
+            user: {
+              connect: {
+                id: userId
+              }
+            },
+            tags: {
+              connectOrCreate: verifiedData.post.tags.map((tag) => ({
+                where: tag,
+                create: tag
+              }))
+            }
+          } : undefined
         }
       },
       include: {
         activities: true,
-        post: true
+        post: {
+          include: {
+            tags: true
+          }
+        }
       }
     })
     return res.status(201).json(newEntry)

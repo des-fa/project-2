@@ -1,14 +1,35 @@
 import prisma from '../../../_helpers/prisma.js'
 import handleErrors from '../../../_helpers/handle-errors.js'
 
+const getCheckedValue = (value) => {
+  // option1 = 'all'
+  // option2 = 'private'
+  // option3 = 'public'
+
+  switch (value) {
+    case 'private': {
+      return false
+    }
+    case 'public': {
+      return true
+    }
+    default: {
+      return undefined
+    }
+  }
+}
+
 const controllersApiMyEntriesIndex = async (req, res) => {
   try {
     const { session: { user: { id: userId } } } = req
 
     // Filters
-    const q = req.query.q || ''
+    const mood = req.query.mood || ''
+    const postTitle = req.query.postTitle || ''
+    const postTag = req.query.postTag || ''
     const orderBy = req.query.orderBy || 'id'
     const sortBy = req.query.sortBy || 'asc'
+    const checked = getCheckedValue(req.query.checked)
 
     // Pagination
     const take = 5
@@ -16,41 +37,49 @@ const controllersApiMyEntriesIndex = async (req, res) => {
     const skip = (page - 1) * take
 
     // Common Where Query
+    const OR = []
     const where = {
       userId,
-      OR: [
-        {
-          post: {
-            entry: {
-              mood: {
-                contains: q
+      post: { checked }
+    }
+
+    if (mood) {
+      OR.push({
+        mood: {
+          contains: mood,
+          mode: 'insensitive'
+        }
+      })
+    }
+
+    if (postTitle) {
+      OR.push({
+        post: {
+          title: {
+            contains: postTitle,
+            mode: 'insensitive'
+          }
+        }
+      })
+    }
+
+    if (postTag) {
+      OR.push({
+        post: {
+          tags: {
+            some: {
+              name: {
+                contains: postTag,
+                mode: 'insensitive'
               }
             }
           }
-        }, {
-          post: {
-            title: {
-              contains: q,
-              mode: 'insensitive'
-            }
-          }
-        }, {
-          post: {
-            tag: {
-              contains: q,
-              mode: 'insensitive'
-            }
-          }
-        }, {
-          post: {
-            checked: true
-          }
-        }, {
-          post: {
-            checked: false
-          }
         }
-      ]
+      })
+    }
+
+    if (OR.length > 0) {
+      where.OR = OR
     }
 
     const totalMyEntries = await prisma.entry.count({ where })
@@ -60,6 +89,13 @@ const controllersApiMyEntriesIndex = async (req, res) => {
       where,
       orderBy: {
         [orderBy]: sortBy
+      },
+      include: {
+        post: {
+          select: {
+            checked: true
+          }
+        }
       }
     })
 
