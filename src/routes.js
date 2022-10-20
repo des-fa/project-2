@@ -13,7 +13,7 @@ router.get('/api/my/user', authenticateUser('json'), (await import('./controller
 router.put('/api/my/user/settings', authenticateUser('json'), (await import('./controllers/api/my/user/settings/update.js')).default)
 
 // API | MY PAGE | AUTH REQUIRED
-// router.get('/api/my/page', authenticateUser('json'), (await import('./controllers/api/my/page/show.js')).default)
+router.get('/api/my/page', authenticateUser('json'), (await import('./controllers/api/my/page/show.js')).default)
 
 // API | MY ENTRIES | AUTH REQUIRED
 router.post('/api/my/entries', authenticateUser('json'), (await import('./controllers/api/my/entries/create.js')).default)
