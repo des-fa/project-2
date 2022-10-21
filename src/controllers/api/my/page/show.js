@@ -18,32 +18,27 @@ import handleErrors from '../../../_helpers/handle-errors.js'
 // document.getElementById('author').innerHTML = `~ ${auth}`
 // }
 
-// const generateQuote = async (req, res) => {
-//   try {
-//     const url = 'https://api.quotable.io/random?tags=motivational|inspirational'
-//     const allQuotes = await fetch(url)
-//     return res.status(200).json(allQuotes)
-//   } catch (err) {
-//     return handleErrors(res, err)
-//   }
-// }
-
-// const generateQuote = async () => {
-//   const url = 'https://api.quotable.io/random?tags=motivational|inspirational'
-//   try {
-//     const res = await fetch(url)
-//     const quote = await res.json()
-//     return quote
-//   } catch (err) {
-//     return err
-//   }
-// }
-
 const controllersApiMyPageShow = async (req, res) => {
   try {
-    fetch('https://api.quotable.io/random?tags=motivational|inspirational')
+    const randomQuote = await fetch('https://api.quotable.io/random?tags=motivational|inspirational')
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then(
+        (data) => ({
+          content: data.content,
+          author: data.author
+        })
+      )
+    // const quote = fetch('https://api.quotable.io/random?tags=motivational|inspirational')
+    //   .then((response) => response.json())
+    //   .then((data) => data)
+    // const generateQuote = () => {
+    //   quote.then((a) => {
+    //     console.log(a)
+    //     return a
+    //   })
+    // }
+
+    // generateQuote()
 
     const { session: { user: { id: userId } } } = req
     const currentDate = moment().toDate()
@@ -69,7 +64,9 @@ const controllersApiMyPageShow = async (req, res) => {
       },
       rejectOnNotFound: true
     })
-    return res.status(200).json(foundEntry)
+    return res.status(200).json({
+      entry: foundEntry,
+      quote: randomQuote })
   } catch (err) {
     return handleErrors(res, err)
   }

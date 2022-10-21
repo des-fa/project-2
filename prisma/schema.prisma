@@ -21,6 +21,13 @@ model User {
   comments     Comment[]
 }
 
+model Quote {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Date
+  content   String
+  author    String
+}
+
 model Entry {
   id         Int        @id @default(autoincrement())
   createdAt  DateTime   @default(now()) @db.Date
