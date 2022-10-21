@@ -28,17 +28,6 @@ const controllersApiMyPageShow = async (req, res) => {
           author: data.author
         })
       )
-    // const quote = fetch('https://api.quotable.io/random?tags=motivational|inspirational')
-    //   .then((response) => response.json())
-    //   .then((data) => data)
-    // const generateQuote = () => {
-    //   quote.then((a) => {
-    //     console.log(a)
-    //     return a
-    //   })
-    // }
-
-    // generateQuote()
 
     const { session: { user: { id: userId } } } = req
     const currentDate = moment().toDate()
