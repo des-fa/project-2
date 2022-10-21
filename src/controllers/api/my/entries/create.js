@@ -1,4 +1,5 @@
 import yup from 'yup'
+import moment from 'moment'
 
 import prisma from '../../../_helpers/prisma.js'
 import handleErrors from '../../../_helpers/handle-errors.js'
@@ -28,9 +29,16 @@ const controllersApiMyEntriesCreate = async (req, res) => {
   try {
     const { body, session: { user: { id: userId } } } = req
     // const userId = req.session.user.id
-
+    const currentDate = moment().toDate()
     const verifiedData = await createSchema.validate(body, { abortEarly: false, stripUnknown: true })
-    const newEntry = await prisma.entry.create({
+
+    const foundEntry = await prisma.entry.findFirst({
+      where: {
+        createdAt: currentDate
+      }
+    })
+
+    const newEntry = foundEntry ? 'Entry already exists' : await prisma.entry.create({
       data: {
         // title: verifiedData.title,
         // description: verifiedData.description,

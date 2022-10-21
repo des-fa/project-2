@@ -20,7 +20,7 @@ import handleErrors from '../../../_helpers/handle-errors.js'
 
 const controllersApiMyPageShow = async (req, res) => {
   try {
-    const randomQuote = await fetch('https://api.quotable.io/random?tags=motivational|inspirational')
+    const getQuote = await fetch('https://api.quotable.io/random?tags=motivational|inspirational')
       .then((response) => response.json())
       .then(
         (data) => ({
@@ -31,6 +31,19 @@ const controllersApiMyPageShow = async (req, res) => {
 
     const { session: { user: { id: userId } } } = req
     const currentDate = moment().toDate()
+
+    const foundQuote = await prisma.quote.findFirst({
+      where: {
+        createdAt: currentDate
+      }
+    })
+
+    const showQuote = foundQuote || await prisma.quote.create({
+      data: {
+        content: getQuote.content,
+        author: getQuote.author
+      }
+    })
 
     const foundEntry = await prisma.entry.findFirst({
       where: {
@@ -55,7 +68,7 @@ const controllersApiMyPageShow = async (req, res) => {
     })
     return res.status(200).json({
       entry: foundEntry,
-      quote: randomQuote })
+      quote: showQuote })
   } catch (err) {
     return handleErrors(res, err)
   }

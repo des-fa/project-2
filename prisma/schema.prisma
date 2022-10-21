@@ -28,8 +28,6 @@ model Entry {
   gratitude  String
   user       User       @relation(fields: [userId], references: [id])
   userId     Int
-  // quote      Quote?     @relation(fields: [quoteId], references: [id])
-  // quoteId    Int?
   activities Activity[]
   post       Post?
 }
@@ -39,7 +37,6 @@ model Quote {
   createdAt DateTime @default(now()) @db.Date
   content   String
   author    String
-  // entries   Entry[]
 }
 
 model Activity {
