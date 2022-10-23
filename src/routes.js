@@ -41,7 +41,7 @@ router.get('/', (await import('./controllers/pages/home.js')).default)
 // router.get('/my/user/settings/edit', authenticateUser('html'), (await import('./controllers/pages/my/user/settings/edit.js')).default)
 
 // PAGES | MY PAGE | AUTH REQUIRED
-// router.get('/my/page', authenticateUser('html'), (await import('./controllers/pages/my/page/show.js')).default)
+router.get('/my/page', authenticateUser('html'), (await import('./controllers/pages/my/page/show.js')).default)
 
 // PAGES | MY ENTRIES | AUTH REQUIRED
 // router.get('/my/entries', authenticateUser('html'), (await import('./controllers/pages/my/entries/index.js')).default)

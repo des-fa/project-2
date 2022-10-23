@@ -19,6 +19,7 @@ app.locals.moment = moment
 // Setting the folder for our views and setting ejs as our views engine
 app.set('views', './src/views')
 app.set('view engine', 'ejs')
+app.set('layout', 'layouts/nav-layout')
 
 // Allows us to use a layout.ejs file as our layout
 app.use(expressLayouts)

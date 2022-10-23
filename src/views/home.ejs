@@ -1,25 +1,84 @@
 <%- contentFor('styles') %>
 <%- contentFor('scripts') %>
-<%- contentFor('body') %>
-<div class="row align-items-center g-lg-5 py-5 mx-5 my-5">
-      <div class="col-lg-7 text-center text-lg-start">
-        <h1 class="display-4 fw-bold lh-1 mb-3">h e a r d</h1>
-        <p class="col-lg-10 fs-4">Because sometimes all we need is an empathetic ear to feel less alone in this world of billions.</p>
-      </div>
-      <div class="col-md-10 mx-auto col-lg-5">
-        <form class="p-4 p-md-5 border rounded-3 bg-light">
-          <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-            <label for="floatingInput">Email address</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-            <label for="floatingPassword">Password</label>
-          </div>
+<script>
+const generateForm = ({ user, errors } = {}) => {
+  return `
+      <form id="login-form" class="p-4 p-md-5 border rounded-3 bg-light">
+        <div class="mb-3">
+          <label for="user-email" class="form-label">Email address</label>
+          <input
+          id="user-email"
+          class="form-control ${errors?.email && 'is-invalid'}"
+          name="email"
+          value="${user?.email || ''}"
+          type="email"
+          ></input>
+          <div class="invalid-feedback">${errors?.email || ''}</div>
+        </div>
 
-          <button class="w-100 btn btn-lg btn-dark" type="submit">Log in</button>
-          <hr class="my-4">
-          <button class="w-100 btn btn-secondary btn-primary" type="submit">Create a new account</button>
-        </form>
-      </div>
-    </div>
+        <div class="mb-3">
+          <label for="user-password" class="form-label">Password</label>
+          <input
+          id="user-password"
+          class="form-control ${errors?.password && 'is-invalid'}"
+          name="password"
+          value="${user?.password || ''}"
+          type="password"
+          ></input>
+          <div class="invalid-feedback">${errors?.password || ''}</div>
+        </div>
+
+        <button id="login-btn" class="w-100 btn btn-lg btn-dark" type="submit">Log in</button>
+        <hr class="my-4">
+        <button class="w-100 btn btn-secondary btn-primary" type="submit">Create a new account</button>
+      </form>
+  `
+}
+
+const generatePage = (info) => {
+  const $page = $('#home')
+  const $form = generateForm(info)
+
+  $page.html('').append($form)
+}
+
+const handleLogin = (e) => {
+  e.preventDefault()
+  console.log($('#login-form')[0])
+
+  const data = parseFormData(new FormData($('#login-form')[0]))
+  $('#login-btn button[type="submit"]').attr('disabled', true)
+  console.log(data)
+
+  axios({
+    method: 'POST',
+    url: '/api/auth/login',
+    data
+  }).then(() => {
+    window.location.href = `/my/page`
+  }).catch((err) => {
+    generatePage({
+      user: data,
+      errors: err.response.data
+    })
+  })
+}
+
+$(document).ready(() => {
+  generatePage()
+  $('#home').on('click', '#login-btn', handleLogin)
+})
+</script>
+
+<%- contentFor('body') %>
+
+<div class="row align-items-center g-lg-5 py-5 px-5 mx-5 my-5">
+  <div class="col-lg-7 text-center text-lg-start">
+    <h1 class="display-4 fw-bold lh-1 mb-3">h e a r d</h1>
+    <p class="col-lg-10 fs-4">Because sometimes all we need is an empathetic ear to feel less alone in this world of billions.</p>
+  </div>
+
+  <div id="home" class="col-md-10 mx-auto col-lg-5">
+  </div>
+
+</div>
