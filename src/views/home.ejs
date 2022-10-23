@@ -3,35 +3,165 @@
 <script>
 const generateForm = ({ user, errors } = {}) => {
   return `
-      <form id="login-form" class="p-4 p-md-5 border rounded-3 bg-light">
-        <div class="mb-3">
-          <label for="user-email" class="form-label">Email address</label>
-          <input
-          id="user-email"
-          class="form-control ${errors?.email && 'is-invalid'}"
-          name="email"
-          value="${user?.email || ''}"
-          type="email"
-          ></input>
-          <div class="invalid-feedback">${errors?.email || ''}</div>
-        </div>
+    <form id="login-form" class="p-4 p-md-5 border rounded-3 bg-light">
+      <div class="mb-3">
+        <label for="login-email" class="form-label">Email address</label>
+        <input
+        id="login-email"
+        class="form-control ${errors?.email && 'is-invalid'}"
+        name="email"
+        value="${user?.email || ''}"
+        type="email"
+        ></input>
+        <div class="invalid-feedback">${errors?.email || ''}</div>
+      </div>
 
-        <div class="mb-3">
-          <label for="user-password" class="form-label">Password</label>
-          <input
-          id="user-password"
-          class="form-control ${errors?.password && 'is-invalid'}"
-          name="password"
-          value="${user?.password || ''}"
-          type="password"
-          ></input>
-          <div class="invalid-feedback">${errors?.password || ''}</div>
-        </div>
+      <div class="mb-3">
+        <label for="login-password" class="form-label">Password</label>
+        <input
+        id="login-password"
+        class="form-control ${errors?.password && 'is-invalid'}"
+        name="password"
+        value="${user?.password || ''}"
+        type="password"
+        ></input>
+        <div class="invalid-feedback">${errors?.password || ''}</div>
+      </div>
 
-        <button id="login-btn" class="w-100 btn btn-lg btn-dark" type="submit">Log in</button>
-        <hr class="my-4">
-        <button class="w-100 btn btn-secondary btn-primary" type="submit">Create a new account</button>
-      </form>
+      <button id="login-btn" class="w-100 btn btn-lg btn-dark" type="submit">Log in</button>
+      <hr class="my-4">
+      <button class="w-100 btn btn-secondary btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#modal-signup">Create a new account</button>
+    </form>
+
+    <div class="modal fade" id="modal-signup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            <h1 class="fw-bold mb-0 fs-2">Sign up for free</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body p-5 pt-0">
+            <form id="signup-form">
+
+              <div class="mb-3">
+                <label for="signup-email" class="form-label">Email address</label>
+                <input
+                id="signup-email"
+                class="form-control rounded-3"
+                name="email"
+                type="email"
+                ></input>
+              </div>
+
+              <div class="mb-3">
+                <label for="signup-password" class="form-label">Password</label>
+                <input
+                id="signup-password"
+                class="form-control rounded-3"
+                name="password"
+                type="password"
+                ></input>
+              </div>
+
+              <div class="mb-3">
+                <label for="signup-password-confirmation" class="form-label">Password Confirmation</label>
+                <input
+                id="signup-password-confirmation"
+                class="form-control rounded-3"
+                name="passwordConfirmation"
+                type="password"
+                ></input>
+              </div>
+
+              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark signup-btn" type="submit">Sign up</button>
+              <small class="text-muted">By clicking Sign up, you agree to the terms of use.</small>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+const generateModalForm = ({ user, errors }= {}) => {
+  return `
+  <form class="p-4 p-md-5 border rounded-3 bg-light">
+      <div class="mb-3">
+        <label for="login-email" class="form-label">Email address</label>
+        <input
+        class="form-control"
+        type="email"
+        ></input>
+      </div>
+
+      <div class="mb-3">
+        <label for="login-password" class="form-label">Password</label>
+        <input
+        class="form-control"
+        type="password"
+        ></input>
+      </div>
+
+      <button class="w-100 btn btn-lg btn-dark" type="submit">Log in</button>
+      <hr class="my-4">
+      <button class="w-100 btn btn-secondary btn-primary" type="button">Create a new account</button>
+    </form>
+
+    <div class="modal show" tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            <h1 class="fw-bold mb-0 fs-2">Sign up for free</h1>
+            <a href="/" class="btn-close"></a>
+          </div>
+
+          <div class="modal-body p-5 pt-0">
+            <form id="signup-form">
+
+              <div class="mb-3">
+                <label for="signup-email" class="form-label">Email address</label>
+                <input
+                id="signup-email"
+                class="form-control rounded-3 ${errors?.email && 'is-invalid'}"
+                name="email"
+                value="${user?.email || ''}"
+                type="email"
+                ></input>
+                <div class="invalid-feedback">${errors?.email || ''}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="signup-password" class="form-label">Password</label>
+                <input
+                id="signup-password"
+                class="form-control rounded-3 ${errors?.password && 'is-invalid'}"
+                name="password"
+                value="${user?.password || ''}"
+                type="password"
+                ></input>
+                <div class="invalid-feedback">${errors?.password || ''}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="signup-password-confirmation" class="form-label">Password Confirmation</label>
+                <input
+                id="signup-password-confirmation"
+                class="form-control rounded-3 ${errors?.passwordConfirmation && 'is-invalid'}"
+                name="passwordConfirmation"
+                value="${user?.passwordConfirmation || ''}"
+                type="password"
+                ></input>
+                <div class="invalid-feedback">${errors?.passwordConfirmation || ''}</div>
+              </div>
+
+              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark signup-btn" type="submit">Sign up</button>
+              <small class="text-muted">By clicking Sign up, you agree to the terms of use.</small>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   `
 }
 
@@ -42,13 +172,20 @@ const generatePage = (info) => {
   $page.html('').append($form)
 }
 
+const generateModal = (info) => {
+  const $page = $('#home')
+  const $form = generateModalForm(info)
+
+  $page.html('').append($form)
+}
+
 const handleLogin = (e) => {
   e.preventDefault()
   console.log($('#login-form')[0])
 
   const data = parseFormData(new FormData($('#login-form')[0]))
-  $('#login-btn button[type="submit"]').attr('disabled', true)
   console.log(data)
+  $('#login-btn button[type="submit"]').attr('disabled', true)
 
   axios({
     method: 'POST',
@@ -64,9 +201,31 @@ const handleLogin = (e) => {
   })
 }
 
+const handleSignup = (e) => {
+  e.preventDefault()
+
+  const data = parseFormData(new FormData($('#signup-form')[0]))
+  console.log(data)
+  $('.signup-btn button[type="submit"]').attr('disabled', true)
+
+  axios({
+    method: 'POST',
+    url: '/api/auth/signup',
+    data
+  }).then(() => {
+    window.location.href = `/my/page`
+  }).catch((err) => {
+    generateModal({
+      user: data,
+      errors: err.response.data
+    })
+  })
+}
+
 $(document).ready(() => {
   generatePage()
   $('#home').on('click', '#login-btn', handleLogin)
+  $('#home').on('click', '.signup-btn', handleSignup)
 })
 </script>
 
