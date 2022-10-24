@@ -1,15 +1,238 @@
 <%- contentFor('styles') %>
 <%- contentFor('scripts') %>
+<script>
+const generateQuote = ({ isLoading, dailyPage } ={}) => {
+  if (isLoading) return `<div class="text-center">Loading...</div>`
+
+  return`
+  <div class="p-4 p-md-5 mb-4 mx-2 rounded text-bg-dark">
+    <div class="col-md-6 px-0">
+      <h1 class="display-4 fst-italic">${dailyPage.quote.content}</h1>
+      <p class="lead my-3">${dailyPage.quote.author}</p>
+    </div>
+  </div>
+  `
+}
+
+const generateEntry = ({ isLoading, dailyPage } ={}) => {
+  if (isLoading) return ''
+  const $modal = $(`
+    <div id="entryModal" class="modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header border-bottom-0">
+            <h1 class="modal-title fs-5">Daily entry not found</h1>
+            <button type="button" class="close-modal-btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body py-0">
+            <p>Track your daily mood, activities and thoughts by creating an entry!</p>
+          </div>
+          <div class="modal-footer flex-column border-top-0">
+            <button type="button" class="create-entry-btn btn btn-lg btn-dark w-100 mx-0 mb-2">Create</button>
+            <button type="button" class="close-modal-btn btn btn-lg btn-outline-secondary w-100 mx-0" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)
+
+  if (!dailyPage.entry) {
+    $modal.modal('show')
+  }
+
+  // if successful need to show entry using dailyPage data
+  // show mood, date, mood name, activities, sentence, blog post
+
+  return``
+}
+
+const generateCreateEntryBtn = () => {
+  const $btn = $(`
+    <div class="row">
+      <div class="text-center">
+      <button type="button" id="secondary-create-entry-btn" class="create-entry-btn btn btn-lg btn-outline-dark w-50 mx-0 mb-2">Create a daily entry</button>
+      </div>
+    </div>
+  `)
+  $('#pages-my-page-show').append($btn)
+}
+
+const generateEntryForm = ({ entry, errors } = {}) => {
+  // catch errors, invalid feedback
+  const $form = $(`
+    <form id="entry-form" class="daily-entry-form">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <h3>Today:</h3>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-1">
+          <img id="moodIcon" src="/images/moods/emotions.png" alt="emotions" width="50"  height="auto" class="rounded-4">
+        </div>
+        <div class="col-4">
+          <div id="moodOptions" class="input-group">
+            <select class="form-select" name="mood">
+              <option selected>Choose...</option>
+              <option value="rad">Rad</option>
+              <option value="good">Good</option>
+              <option value="meh">Meh</option>
+              <option value="bad">Bad</option>
+              <option value="awful">Awful</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="w-100"></div>
+
+        <div class="col-6">
+          <ul  id="activityOptions" class="list-group">
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox"  value="social" name="activity[]" id="social">
+              <label class="form-check-label" for="social">Social Time</  label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox"  value="alone" name="activity[]" id="alone">
+              <label class="form-check-label" for="alone">Alone Time</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox"  value="exercise" name="activity[]" id="exercise">
+              <label class="form-check-label" for="exercise">Exercise</label>
+            </li>
+
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox"  value="chores" name="activity[]" id="chores">
+              <label class="form-check-label" for="chores">Chores</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox"  value="sleep" name="activity[]" id="sleep">
+              <label class="form-check-label" for="sleep">Sleep</label>
+            </li>
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox"  value="eat" name="activity[]" id="eat">
+              <label class="form-check-label" for="eat">Eat Well</label>
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-6">
+          <label for="gratitudeSentence" class="form-label">I am grateful   for...</label>
+          <textarea class="form-control" id="gratitudeSentence"   name="gratitude" rows="3"></textarea>
+        </div>
+      </div>
+    </form>
+
+    <form id="post-form" class="daily-entry-form">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <h5>Post (Optional)</h5>
+        </div>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="postTitle" class="form-label">Title</label>
+          <input type="text" class="form-control" name="title" id="postTitle"
+        </div>
+
+        <div class="col-6">
+          <label for="postContent" class="form-label">Content</label>
+          <textarea class="form-control" name="content" id="postContent"  rows="3"></textarea>
+        </div>
+
+        <div class="w-100"></div>
+
+      <div class="row g-3">
+      <div class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" name="checked" type="checkbox" id="gridCheck1">
+          <label class="form-check-label" for="gridCheck1">
+            Public
+          </label>
+        </div>
+      </div>
+      <div class="col-12">
+        <button id="submit-entry-btn" type="submit" class="btn btn-dark">Submit</button>
+      </div>
+      </div>
+    </form>
+  `)
+  $('#pages-my-page-show').append($form)
+}
+
+const generatePage = (info) => {
+  const $page = $('#pages-my-page-show')
+  const $quote = generateQuote(info)
+  const $entry = generateEntry(info)
+
+  $page.html('').append($quote).append($entry)
+}
+
+const getDailyPage = () => {
+  axios({
+    method: 'GET',
+    url: '/api/my/page'
+  }).then((resp) => {
+    generatePage({ dailyPage: resp.data })
+  }).catch((err) => {
+    generatePage()
+  })
+}
+const handleAddCreateEntryBtn = (e) => {
+  e.preventDefault()
+  generateCreateEntryBtn()
+}
+const handleCreateEntry = (e) => {
+  e.preventDefault()
+  $('.create-entry-btn button[type="submit"]').attr('disabled', true)
+  $('#entryModal').modal('hide')
+  $('#secondary-create-entry-btn').addClass("invisible")
+  generateEntryForm()
+}
+
+const handleMoodSelect = (e) => {
+  const moodSelection = e.target.value
+  console.log(moodSelection)
+  $('#moodIcon').attr("src", `/images/moods/${moodSelection}.png`)
+}
+
+const handleSubmitEntry =  (e) => {
+  e.preventDefault()
+  $('#submit-entry-btn button[type="submit"]').attr('disabled', true)
+
+const entryData = parseFormData(new FormData($('.daily-entry-form')[0]))
+const postData = parseFormData(new FormData($('.daily-entry-form')[1]))
+const data = []
+data.push(entryData)
+data.push(postData)
+console.log(data)
+//something wrong with activities
+// needs to grab mood, activity, gratitude posts data
+
+//   axios({
+//     method: 'POST',
+//     url: '/api/my/wishlists',
+//     data
+//   }).then((resp) => {
+//     window.location.href = `/my/wishlists/${resp.data.id}`
+//   }).catch((err) => {
+//     generatePage({ wishlist: parseFormData(data), errors: err.response.data })
+//   })
+}
+
+$(document).ready(() => {
+generatePage({ isLoading: true })
+getDailyPage()
+$('body').on('click', '.close-modal-btn', handleAddCreateEntryBtn)
+$('body').on('click', '.create-entry-btn', handleCreateEntry)
+$('#pages-my-page-show').on('change', '#moodOptions', handleMoodSelect)
+$('#pages-my-page-show').on('click', '#submit-entry-btn', handleSubmitEntry)
+
+// event listener for editing deleting
+})
+</script>
 
 <%- contentFor('body') %>
+<div id="pages-my-page-show" class="container"></div>
 
-<div class="row align-items-center g-lg-5 py-5 px-5 mx-5 my-5">
-  <div class="col-lg-7 text-center text-lg-start">
-    <h1 class="display-4 fw-bold lh-1 mb-3">h e a r d</h1>
-    <p class="col-lg-10 fs-4">Because sometimes all we need is an empathetic ear to feel less alone in this world of billions.</p>
-  </div>
-
-  <div id="home" class="col-md-10 mx-auto col-lg-5">
-  </div>
-
-</div>
+<!-- <img class="mood-icon" src="/public/images/moods/sad.png" data-mood="sad" alt=""> -->

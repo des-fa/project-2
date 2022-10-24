@@ -21,7 +21,8 @@ const createSchema = yup.object({
       yup.object({
         name: yup.string().transform((value) => value.toUpperCase()).required()
       })
-    ).min(1).required()
+    )
+    // .min(1).required()
   }).default(undefined)
 })
 

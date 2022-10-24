@@ -63,8 +63,7 @@ const controllersApiMyPageShow = async (req, res) => {
             tags: true
           }
         }
-      },
-      rejectOnNotFound: true
+      }
     })
     return res.status(200).json({
       entry: foundEntry,

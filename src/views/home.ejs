@@ -55,6 +55,16 @@ const generateForm = ({ user, errors } = {}) => {
               </div>
 
               <div class="mb-3">
+                <label for="signup-username" class="form-label">Username</label>
+                <input
+                id="signup-username"
+                class="form-control rounded-3"
+                name="username"
+                type="text"
+                ></input>
+              </div>
+
+              <div class="mb-3">
                 <label for="signup-password" class="form-label">Password</label>
                 <input
                 id="signup-password"
@@ -64,6 +74,7 @@ const generateForm = ({ user, errors } = {}) => {
                 ></input>
               </div>
 
+
               <div class="mb-3">
                 <label for="signup-password-confirmation" class="form-label">Password Confirmation</label>
                 <input
@@ -72,9 +83,19 @@ const generateForm = ({ user, errors } = {}) => {
                 name="passwordConfirmation"
                 type="password"
                 ></input>
-              </div>
+                </div>
 
-              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark signup-btn" type="submit">Sign up</button>
+                <div class="mb-3">
+                  <label for="signup-avatar" class="form-label">Avatar</label>
+                  <input
+                  id="signup-avatar"
+                  class="form-control rounded-3"
+                  name="avatar"
+                  type="file"
+                  ></input>
+                </div>
+
+                <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark signup-btn" type="submit">Sign up</button>
               <small class="text-muted">By clicking Sign up, you agree to the terms of use.</small>
             </form>
           </div>
@@ -85,7 +106,7 @@ const generateForm = ({ user, errors } = {}) => {
 }
 
 const generateModalForm = ({ user, errors }= {}) => {
-  return `
+  const $form = $(`
   <form class="p-4 p-md-5 border rounded-3 bg-light">
       <div class="mb-3">
         <label for="login-email" class="form-label">Email address</label>
@@ -132,6 +153,18 @@ const generateModalForm = ({ user, errors }= {}) => {
               </div>
 
               <div class="mb-3">
+                <label for="signup-username" class="form-label">Username</label>
+                <input
+                id="signup-username"
+                class="form-control rounded-3 ${errors?.username && 'is-invalid'}"
+                name="username"
+                value="${user?.username || ''}"
+                type="text"
+                ></input>
+                <div class="invalid-feedback">${errors?.username || ''}</div>
+              </div>
+
+              <div class="mb-3">
                 <label for="signup-password" class="form-label">Password</label>
                 <input
                 id="signup-password"
@@ -155,6 +188,17 @@ const generateModalForm = ({ user, errors }= {}) => {
                 <div class="invalid-feedback">${errors?.passwordConfirmation || ''}</div>
               </div>
 
+              <div class="mb-3">
+                <label for="signup-avatar" class="form-label">Avatar</label>
+                <input
+                id="signup-avatar"
+                class="form-control rounded-3"
+                name="avatar"
+                type="file"
+                ></input>
+                <div class="invalid-feedback">${errors?.avatar || ''}</div>
+              </div>
+
               <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark signup-btn" type="submit">Sign up</button>
               <small class="text-muted">By clicking Sign up, you agree to the terms of use.</small>
             </form>
@@ -162,7 +206,14 @@ const generateModalForm = ({ user, errors }= {}) => {
         </div>
       </div>
     </div>
-  `
+  `)
+
+    if (user?.avatar?.constructor?.name === 'File') {
+    const $avatar = $('#signup-avatar').attr('class', `form-control ${errors?.avatar && 'is-invalid'}`)
+    $form.find('#signup-avatar').replaceWith($avatar)
+  }
+
+  return $form
 }
 
 const generatePage = (info) => {
@@ -181,10 +232,10 @@ const generateModal = (info) => {
 
 const handleLogin = (e) => {
   e.preventDefault()
-  console.log($('#login-form')[0])
+  // console.log($('#login-form')[0])
 
   const data = parseFormData(new FormData($('#login-form')[0]))
-  console.log(data)
+  // console.log(data)
   $('#login-btn button[type="submit"]').attr('disabled', true)
 
   axios({

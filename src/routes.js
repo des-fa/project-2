@@ -34,7 +34,7 @@ router.get('/api/public-posts/:id', authenticateUser('json'), (await import('./c
 // API | NOT FOUND
 router.use('/api', (await import('./controllers/api/not-found.js')).default)
 
-// PAGES | HOMEPAGE | STATIC
+// PAGES | HOMEPAGE
 router.get('/', (await import('./controllers/pages/home.js')).default)
 
 // PAGES | MY USER | AUTH REQUIRED
