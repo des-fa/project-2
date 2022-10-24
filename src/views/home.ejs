@@ -105,7 +105,7 @@ const generateForm = ({ user, errors } = {}) => {
   `
 }
 
-const generateModalForm = ({ user, errors }= {}) => {
+const generateModalForm = ({ user, errors } = {}) => {
   const $form = $(`
   <form class="p-4 p-md-5 border rounded-3 bg-light">
       <div class="mb-3">
@@ -208,7 +208,7 @@ const generateModalForm = ({ user, errors }= {}) => {
     </div>
   `)
 
-    if (user?.avatar?.constructor?.name === 'File') {
+  if (user?.avatar?.constructor?.name === 'File') {
     const $avatar = $('#signup-avatar').attr('class', `form-control ${errors?.avatar && 'is-invalid'}`)
     $form.find('#signup-avatar').replaceWith($avatar)
   }

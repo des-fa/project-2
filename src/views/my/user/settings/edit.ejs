@@ -1,0 +1,259 @@
+<%- contentFor('styles') %>
+<%- contentFor('scripts') %>
+<script>
+
+const generateUser = ({ isLoading, user } = {}) => {
+  if (isLoading) return `<div class="text-center">Loading...</div>`
+  if (!user) return `<h1 class="text-center mb-3">User Not Found :(</h1>`
+
+  return `
+    <div class="w-75">
+      <div class="d-flex justify-content-end">
+        <button id="edit-user-btn" class="btn btn-sm btn-dark me-md-2" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit-user">Edit</button>
+      </div>
+    </div>
+
+    <div class="mb-1 row">
+      <div class="col-sm-10">
+        <img id="staticAvatar" src="${user.avatar}" alt="avatar" width="75"  height="auto" class="rounded-circle">
+      </div>
+    </div>
+
+    <div class="mb-3 row">
+      <label for="staticAvatar" class="col-sm-2   col-form-label">Avatar</label>
+    </div>
+
+    <div class="mb-3 row">
+      <label for="staticUsername" class="col-sm-2   col-form-label">Username: </label>
+      <div class="col-sm-10">
+        <input type="text" readonly class="form-control-plaintext"  id="staticUsername" value="${user.username}">
+      </div>
+    </div>
+
+    <div class="mb-3 row">
+      <label for="staticEmail" class="col-sm-2 col-form-label">Email: </label>
+      <div class="col-sm-10">
+        <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="${user.email}">
+      </div>
+    </div>
+
+    <div class="mb-3 row">
+      <label for="staticPassword" class="col-sm-2 col-form-label">Password: </label>
+      <div class="col-sm-10">
+        <input type="text" readonly class="form-control-plaintext" id="staticPassword" value="*****">
+      </div>
+    </div>
+
+    <div class="modal fade" id="modal-edit-user" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            <h1 class="fw-bold mb-0 fs-2">Edit your account information</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body p-5 pt-0">
+            <form id="edit-user-form">
+
+              <div class="mb-3">
+                <label for="edit-email" class="form-label">Email address</label>
+                <input
+                id="edit-email"
+                class="form-control rounded-3"
+                name="email"
+                type="email"
+                ></input>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-username" class="form-label">Username</label>
+                <input
+                id="edit-username"
+                class="form-control rounded-3"
+                name="username"
+                type="text"
+                ></input>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-password" class="form-label">Password</label>
+                <input
+                id="edit-password"
+                class="form-control rounded-3"
+                name="password"
+                type="password"
+                ></input>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-password-confirmation" class="form-label">Password Confirmation</label>
+                <input
+                id="edit-password-confirmation"
+                class="form-control rounded-3"
+                name="passwordConfirmation"
+                type="password"
+                ></input>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-avatar" class="form-label">Avatar</label>
+                <input
+                id="edit-avatar"
+                class="form-control rounded-3"
+                name="avatar"
+                type="file"
+                ></input>
+              </div>
+              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark edit-submit-btn" type="submit">Confirm</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+const generateModalForm = ({ user, errors } = {}) => {
+  const $form = $(`
+    <div class="modal show" tabindex="-1" aria-modal="true" role="dialog" style="display: block;">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            <h1 class="fw-bold mb-0 fs-2">Edit your account information</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body p-5 pt-0">
+            <form id="edit-user-form">
+
+              <div class="mb-3">
+                <label for="edit-email" class="form-label">Email address</label>
+                <input
+                id="edit-email"
+                class="form-control rounded-3 ${errors?.email && 'is-invalid'}"
+                name="email"
+                value="${user?.email || ''}"
+                type="email"
+                ></input>
+                <div class="invalid-feedback">${errors?.email || ''}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-username" class="form-label">Username</label>
+                <input
+                id="edit-username"
+                class="form-control rounded-3 ${errors?.username && 'is-invalid'}"
+                name="username"
+                value="${user?.username || ''}"
+                type="text"
+                ></input>
+                <div class="invalid-feedback">${errors?.username || ''}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-password" class="form-label">Password</label>
+                <input
+                id="edit-password"
+                class="form-control rounded-3 ${errors?.password && 'is-invalid'}"
+                name="password"
+                value="${user?.password || ''}"
+                type="password"
+                ></input>
+                <div class="invalid-feedback">${errors?.password || ''}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-password-confirmation" class="form-label">Password Confirmation</label>
+                <input
+                id="edit-password-confirmation"
+                class="form-control rounded-3 ${errors?.passwordConfirmation && 'is-invalid'}"
+                name="passwordConfirmation"
+                value="${user?.passwordConfirmation || ''}"
+                type="password"
+                ></input>
+                <div class="invalid-feedback">${errors?.passwordConfirmation || ''}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="edit-avatar" class="form-label">Avatar</label>
+                <input
+                id="edit-avatar"
+                class="form-control rounded-3"
+                name="avatar"
+                type="file"
+                ></input>
+                <div class="invalid-feedback">${errors?.avatar || ''}</div>
+              </div>
+              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-dark edit-submit-btn" type="submit">Confirm</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)
+
+  if (user?.avatar?.constructor?.name === 'File') {
+    const $avatar = $('#edit-avatar').attr('class', `form-control ${errors?.avatar && 'is-invalid'}`)
+    $form.find('#edit-avatar').replaceWith($avatar)
+  }
+
+  return $form
+}
+
+const generatePage = (info) => {
+  const $page = $('#pages-my-user-settings-edit')
+  const $user = generateUser(info)
+
+  $page.html('').append($user)
+}
+
+const generateModal = (info) => {
+  const $page = $('#pages-my-user-settings-edit')
+  const $form = generateModalForm(info)
+
+  $page.html('').append($form)
+}
+
+const getUser = () => {
+  axios({
+    method: 'GET',
+    url: `/api/my/user`
+  }).then((resp) => {
+    generatePage({ user: resp.data })
+  }).catch((err) => {
+    generatePage()
+  })
+}
+
+const handleSubmitEditUser = (e) => {
+  e.preventDefault()
+  console.log('hi')
+  const data = parseFormData(new FormData($('#edit-user-form')[0]))
+  $('.edit-submit-btn button[type="submit"]').attr('disabled', true)
+  console.log(data)
+
+  axios({
+    method: 'PUT',
+    url: '/api/my/user/settings',
+    data
+  }).then((resp) => {
+    window.location.href = `/my/user/settings/edit`
+  }).catch((err) => {
+    generateModal({
+      user: data,
+      errors: err.response.data
+    })
+  })
+}
+
+$(document).ready(() => {
+generatePage({ isLoading: true })
+getUser()
+$('#body').on('click', '.edit-submit-btn', handleSubmitEditUser)
+})
+</script>
+
+<%- contentFor('body') %>
+<div id="pages-my-user-settings-edit" class="container"></div>
+
+<!-- need to generate page again with new info -->

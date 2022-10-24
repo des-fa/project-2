@@ -4,20 +4,6 @@ import fetch from 'node-fetch'
 import prisma from '../../../_helpers/prisma.js'
 import handleErrors from '../../../_helpers/handle-errors.js'
 
-// const generateQuote = async () => {
-//   const url = 'https://type.fit/api/quotes'
-
-//   const response = await fetch(url)
-//   const allQuotes = await response.json()
-// const randomIdx = Math.floor(Math.random() * allQuotes.length)
-// const quoteText = allQuotes[randomIdx].text
-// const auth = allQuotes[randomIdx].author
-
-// if (!auth) { author = 'Anonymous' }
-// document.getElementById('QuoteText').innerHTML = quoteText
-// document.getElementById('author').innerHTML = `~ ${auth}`
-// }
-
 const controllersApiMyPageShow = async (req, res) => {
   try {
     const getQuote = await fetch('https://api.quotable.io/random?tags=motivational|inspirational')
@@ -73,7 +59,4 @@ const controllersApiMyPageShow = async (req, res) => {
   }
 }
 
-export default [
-  // generateQuote,
-  controllersApiMyPageShow
-]
+export default controllersApiMyPageShow
