@@ -1,5 +1,78 @@
-<nav class="navbar sticky-top navbar-light bg-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">h e a r d.</a>
+<script>
+const generateLinks = ({ isLoading, user} = {}) => {
+  let redirectPage = () => {
+    let tID = setTimeout(function () {
+        window.location.href = "/"
+        window.clearTimeout(tID)
+    }, 4000)
+  }
+
+  if (isLoading) return $('#navbar-dynamic-links').html('loading...')
+
+  $('#navbar-dynamic-links').html(user ? `
+        <ul class="nav w-100 my-2 me-4 justify-content-end">
+        <li>
+          <a href="/public-posts" class="nav-link px-2 text-white">
+            <img src="/images/links/community.png" alt="community" width="35" height="35" class="d-block mx-auto mb-1">
+            Community
+          </a>
+        </li>
+      </ul>
+
+      <div class="flex-shrink-0 dropdown">
+        <a href="#" class="d-block link-light text-decoration-nonedropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="${user.avatar}" alt="avatar" width="55"height="55" class="bg-white border border-white border-3 rounded-circle">
+        </a>
+        <ul class="dropdown-menu text-small shadow" style="">
+          <li><a class="dropdown-item" href="/my/page">Today's Entry</a></li>
+          <li><a class="dropdown-item" href="/my/entries">My Entries</a></li>
+          <li><a class="dropdown-item" href="/my/user/settings/edit">Account Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a id="auth-logout" class="dropdown-item" href="#">Log Out</a><li>
+        </ul>
+      </div>
+  ` :
+    redirectPage()
+  )
+}
+
+const getMyUser = () => {
+  generateLinks({ isLoading: true })
+
+  axios({
+    method: 'GET',
+    url: '/api/my/user',
+  }).then((resp) => {
+    generateLinks({ user: resp.data })
+  }).catch(() => {
+    generateLinks()
+  })
+}
+
+const handleLogout = (e) => {
+  e.preventDefault()
+
+  axios({
+    method: 'DELETE',
+    url: '/api/auth/logout'
+  }).then(() => {
+    window.location.href = '/'
+  })
+}
+
+$(document).ready(() => {
+  getMyUser()
+  $('body').on('click', '#auth-logout', handleLogout)
+})
+</script>
+
+<header class="py-2 px-4 mb-5 border-bottom text-bg-dark">
+  <div class="container-fluid d-grid gap-3 align-items-center" style="grid-template-columns: 1fr 2fr;">
+    <div>
+      <span class="d-flex align-items-center col-lg-4 mb-2 mb-lg-0 fs-2 text-white text-decoration-none">h e a r d.</span>
+    </div>
+
+    <div id="navbar-dynamic-links" class="d-flex justify-content-end align-items-center">
+    </div>
   </div>
-</nav>
+</header>

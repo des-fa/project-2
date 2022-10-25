@@ -227,20 +227,20 @@ const getUser = () => {
 
 const handleSubmitEditUser = (e) => {
   e.preventDefault()
-  console.log('hi')
-  const data = parseFormData(new FormData($('#edit-user-form')[0]))
+  const data = new FormData($('#edit-user-form')[0])
   $('.edit-submit-btn button[type="submit"]').attr('disabled', true)
-  console.log(data)
+
 
   axios({
     method: 'PUT',
     url: '/api/my/user/settings',
     data
   }).then((resp) => {
-    window.location.href = `/my/user/settings/edit`
+    // window.location.href = `/my/user/settings/edit`
+    console.log('hi')
   }).catch((err) => {
     generateModal({
-      user: data,
+      user: parseFormData(data),
       errors: err.response.data
     })
   })

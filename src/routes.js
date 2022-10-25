@@ -44,12 +44,12 @@ router.get('/my/user/settings/edit', authenticateUser('html'), (await import('./
 router.get('/my/page', authenticateUser('html'), (await import('./controllers/pages/my/page/show.js')).default)
 
 // PAGES | MY ENTRIES | AUTH REQUIRED
-// router.get('/my/entries', authenticateUser('html'), (await import('./controllers/pages/my/entries/index.js')).default)
+router.get('/my/entries', authenticateUser('html'), (await import('./controllers/pages/my/entries/index.js')).default)
 // router.get('/my/entries/:id', authenticateUser('html'), (await import('./controllers/pages/my/entries/show.js')).default)
 // router.get('/my/entries/:id/edit', authenticateUser('html'), (await import('./controllers/pages/my/entries/edit.js')).default)
 
 // PAGES | PUBLIC POSTS | AUTH REQUIRED
-// router.get('/public-posts', (await import('./controllers/pages/public-posts/index.js')).default)
+router.get('/public-posts', (await import('./controllers/pages/public-posts/index.js')).default)
 // router.get('/public-posts/:id', (await import('./controllers/pages/public-posts/show.js')).default)
 
 // PAGES | NOT FOUND
