@@ -1,0 +1,232 @@
+<%- contentFor('styles') %>
+<%- contentFor('scripts') %>
+<script>
+const generateTitle = () => {
+  return '<h1 class="text-center mb-3">My Entries</h1>'
+}
+
+const generateFilter = ({ queries: { mood, postTitle, orderBy, sortBy, checked} = {} } = {}) => {
+  console.log(mood)
+    $('#dynamicSearchItem').html(mood ? `help`: ``)
+
+  // if (orderBy === 'postTitle') {
+  //   $('#postTitleSearchWithErrors').css("display", "")
+
+  // }
+  return `
+    <form id="filter-form" class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-3">
+
+      <div id="filterSelection" class="col-12">
+        <div class="input-group">
+          <div class="input-group-text">Filter By</div>
+          <select class="form-select" name="orderBy" value="${orderBy || ''}">
+            <option ${orderBy === 'id' ? 'selected' : ''} value="id">Entry Id</option>
+            <option ${orderBy === 'mood' ? 'selected' : ''} value="mood">Mood</option>
+            <option ${orderBy === 'postTitle' ? 'selected' : ''} value="postTitle">Post Title</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="dynamicSearchItem" class="col-12">
+      </div>
+
+      <div id="postTitleSearchWithErrors" class="col-12" style="display: none">
+      </div>
+
+      <div class="col-12">
+        <div class="input-group">
+          <div class="input-group-text">Sort By</div>
+          <select class="form-select" name="sortBy">
+            <option ${sortBy === 'asc' ? 'selected' : ''} value="asc">Ascending</option>
+            <option ${sortBy === 'desc' ? 'selected' : ''} value="desc">Descending</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <button id="filter-submit-btn" class="btn btn-dark" type="submit" >Submit</button>
+      </div>
+
+      <div class="col-12">
+        <button id="reset-form" class="btn btn-outline-secondary" type="reset">Reset</button>
+      </div>
+<div class="w-100"></div>
+  <div class="form-check form-check-inline">
+  <input class="form-check-input" type="radio" name="checked" id="inlineRadio1" value="all">
+  <label class="form-check-label" for="inlineRadio1">All</label>
+</div>
+<div class="form-check form-check-inline">
+  <input class="form-check-input" type="radio" name="checked" id="inlineRadio2" value="private">
+  <label class="form-check-label" for="inlineRadio2">Private</label>
+</div>
+<div class="form-check form-check-inline">
+  <input class="form-check-input" type="radio" name="checked" id="inlineRadio3" value="public">
+  <label class="form-check-label" for="inlineRadio3">Public</label>
+</div>
+    </form>
+  `
+}
+
+const generateEntry = (entry) => {
+  return `
+    <a href="/my/entries/${entry.id}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+      <img src="/images/moods/${entry.mood}.png" alt="mood" width="32" height="32" class="rounded-circle flex-shrink-0">
+      <div class="d-flex gap-2 w-100 justify-content-between">
+        <div>
+          <h6 class="mb-0">${entry.mood}</h6>
+          <p class="mb-0 opacity-75">${entry.gratitude}</p>
+        </div>
+        <small class="opacity-50 text-nowrap">${entry.createdAt.substring(0, 10)}</small>
+      </div>
+    </a>
+  `
+}
+
+const generateEntries = ({ isLoading, entries = []} = {}) => {
+  if (isLoading) return `<div class="text-center mb-3">Loading...</div>`
+  if (entries.length === 0) {
+    return `
+      <h2 class="text-center mb-3">No Entry Found! :(</h2>
+      <div class="text-center">
+        <a class="btn btn-dark" href="/my/page">Create New Entry</a>
+      </div>
+    `
+  }
+
+  return `
+    <div id="entries-list" class="list-group w-auto">
+      ${entries.map(generateEntry).join('')}
+    </div>
+  `
+}
+
+const generatePagination = (isLoading, { currentPage, totalPages } = {}) => {
+  if (isLoading || !totalPages || totalPages <= 1) return ''
+
+  let links = ''
+
+  if (totalPages > 2 && currentPage > 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="1">First</a></li>`
+  if (currentPage - 1 >= 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}">Prev</a></li>`
+  if (currentPage - 2 >= 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 2}">${currentPage - 2}</a></li>`
+  if (currentPage - 1 >= 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}">${currentPage - 1}</a></li>`
+
+  links += `<li class="page-item active"><a class="page-link">${currentPage}</a></li>`
+
+  if (currentPage + 1 <= totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}">${currentPage + 1}</a></li>`
+  if (currentPage + 2 <= totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 2}">${currentPage + 2}</a></li>`
+  if (currentPage + 1 <= totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`
+  if (totalPages > 2 && currentPage < totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">Last</a></li>`
+
+  return `
+    <ul class="pagination justify-content-center mt-3">
+      ${links}
+    </ul>
+  `
+}
+
+const generatePage = (info) => {
+  const $page = $('#pages-my-entries-index')
+  const $title = generateTitle(info)
+  const $filter = generateFilter(info)
+  const $entries = generateEntries(info)
+  const $pagination = generatePagination(info)
+
+  $page.html('').append($title).append($filter).append($entries).append($pagination)
+}
+
+const handleFilterSelect = (e) => {
+  const filterSelection = e.target.value
+  let $dynamicSearchItem = $('#dynamicSearchItem')
+
+  const $moodSelection = (`
+    <div class="input-group">
+      <label class="input-group-text" for="moodOptions">Options</label>
+        <select class="form-select" name="mood" id="moodOptions">
+          <option selected>Choose...</option>
+          <option value="rad">Rad</option>
+          <option value="good">Good</option>
+          <option value="meh">Meh</option>
+          <option value="bad">Bad</option>
+          <option value="awful">Awful</option>
+        </select>
+    </div>
+  `)
+
+  const $postTitleSearch = (`
+    <div class="input-group">
+      <div class="input-group-text">Search</div>
+        <input class="form-control" placeholder="Content" name="postTitle" type="text">
+    </div>
+  `)
+
+  if (filterSelection === "mood") {
+    $dynamicSearchItem.html('').append($moodSelection)
+  }
+
+  if (filterSelection === "postTitle") {
+    $dynamicSearchItem.html('').append($postTitleSearch)
+  }
+
+  if (filterSelection === "id") {
+    $dynamicSearchItem.html('')
+  }
+}
+
+const handleFilterSubmit = (e) => {
+  e.preventDefault()
+  console.log($('#filter-form')[0])
+    const queries = parseFormData(new FormData($('#filter-form')[0]))
+    console.log(queries)
+    generatePage({ isLoading: true, queries })
+    // $('#dynamicSearchItem').html(queries.mood? `help`: ``)
+
+
+
+
+    // axios({
+    //   method: 'GET',
+    //   url: '/api/my/entries',
+    //   params: queries
+    // }).then((resp) => {
+    //   generatePage({ entries: resp.data.entries, meta: resp.data.meta, queries })
+    // })
+}
+
+$(document).ready(() => {
+  generatePage({ isLoading: true })
+
+  axios({
+    method: 'GET',
+    url: '/api/my/entries'
+  }).then((resp) => {
+    generatePage({ entries: resp.data.entries, meta: resp.data.meta })
+  })
+
+// On Filter Selection
+  $('#pages-my-entries-index').on('change', '#filterSelection', handleFilterSelect)
+
+// On Filter Submit
+  $('#pages-my-entries-index').on('click', '#filter-submit-btn', handleFilterSubmit)
+})
+</script>
+
+<%- contentFor('body') %>
+<div id="pages-my-entries-index" class="container"></div>
+
+<!--
+          <div class="input-group">
+          <label class="input-group-text" for="moodOptions">Options</label>
+          <select class="form-select" name="mood" id="moodOptions" value="${mood || ''}">
+            <option selected>Choose...</option>
+            <option ${mood === 'rad' ? 'selected' : ''} value="rad">Rad</option>
+            <option ${mood === 'good' ? 'selected' : ''} value="good">Good</option>
+            <option ${mood === 'meh' ? 'selected' : ''} value="meh">Meh</option>
+            <option ${mood === 'bad' ? 'selected' : ''} value="bad">Bad</option>
+            <option ${mood === 'awful' ? 'selected' : ''} value="awful">Awful</option>
+          </select>
+        </div> -->
+
+  <!-- <div class="input-group">
+<div class="input-group-text">Search</div>
+<input class="form-control" placeholder="Content" name="postTitle" type="text" value="${postTitle || ''}">
+</div> -->

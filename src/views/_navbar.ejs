@@ -7,7 +7,7 @@ const generateLinks = ({ isLoading, user} = {}) => {
     }, 4000)
   }
 
-  if (isLoading) return $('#navbar-dynamic-links').html('loading...')
+  if (isLoading) return $('#navbar-dynamic-links').html('Loading...')
 
   $('#navbar-dynamic-links').html(user ? `
         <ul class="nav w-100 my-1 me-4 justify-content-end">
