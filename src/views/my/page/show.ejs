@@ -21,10 +21,10 @@ const generateEntry = ({ isLoading, dailyPage } ={}) => {
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 shadow">
           <div class="modal-header border-bottom-0">
-            <h1 class="modal-title fs-5">Daily entry not found</h1>
+            <h1 class="modal-title fs-4">Daily entry not found</h1>
             <button type="button" class="close-modal-btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body py-0">
+          <div class="modal-body py-0 fs-5">
             <p>Track your daily mood, activities and thoughts by creating an entry!</p>
           </div>
           <div class="modal-footer flex-column border-top-0">
@@ -37,6 +37,7 @@ const generateEntry = ({ isLoading, dailyPage } ={}) => {
   `)
 
   if (!dailyPage.entry) {
+    $modal.modal({backdrop: 'static', keyboard: false})
     $modal.modal('show')
   }
 
@@ -89,11 +90,11 @@ const generateEntryForm = ({ entry, errors } = {}) => {
         <div class="col-6">
           <ul  id="activityOptions" class="list-group">
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="social" name="activity[]" id="social">
+              <input class="form-check-input me-1" type="checkbox"  value="social" name="activities[][activity]" id="social">
               <label class="form-check-label" for="social">Social Time</  label>
             </li>
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="alone" name="activity[]" id="alone">
+              <input class="form-check-input me-1" type="checkbox"  value="alone" name="activities[][activity]" id="alone">
               <label class="form-check-label" for="alone">Alone Time</label>
             </li>
             <li class="list-group-item">

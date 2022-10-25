@@ -10,7 +10,7 @@ const generateLinks = ({ isLoading, user} = {}) => {
   if (isLoading) return $('#navbar-dynamic-links').html('loading...')
 
   $('#navbar-dynamic-links').html(user ? `
-        <ul class="nav w-100 my-2 me-4 justify-content-end">
+        <ul class="nav w-100 my-1 me-4 justify-content-end">
         <li>
           <a href="/public-posts" class="nav-link px-2 text-white">
             <img src="/images/links/community.png" alt="community" width="35" height="35" class="d-block mx-auto mb-1">

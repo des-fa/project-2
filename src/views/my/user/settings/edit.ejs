@@ -228,16 +228,14 @@ const getUser = () => {
 const handleSubmitEditUser = (e) => {
   e.preventDefault()
   const data = new FormData($('#edit-user-form')[0])
-  $('.edit-submit-btn button[type="submit"]').attr('disabled', true)
-
+  $('#edit-user-form button[type="submit"]').attr('disabled', true)
 
   axios({
     method: 'PUT',
     url: '/api/my/user/settings',
     data
   }).then((resp) => {
-    // window.location.href = `/my/user/settings/edit`
-    console.log('hi')
+    window.location.href = `/my/user/settings/edit`
   }).catch((err) => {
     generateModal({
       user: parseFormData(data),
@@ -246,14 +244,32 @@ const handleSubmitEditUser = (e) => {
   })
 }
 
+const handleCloseModal = (e) => {
+  e.preventDefault()
+  window.location.href = `/my/user/settings/edit`
+}
+
 $(document).ready(() => {
 generatePage({ isLoading: true })
 getUser()
-$('#body').on('click', '.edit-submit-btn', handleSubmitEditUser)
+$('#pages-my-user-settings-edit').on('click', '.edit-submit-btn', handleSubmitEditUser)
+$('#pages-my-user-settings-edit').on('click', '.btn-close', handleCloseModal)
 })
+
 </script>
 
 <%- contentFor('body') %>
 <div id="pages-my-user-settings-edit" class="container"></div>
 
-<!-- need to generate page again with new info -->
+
+
+  <!-- if (!data.values) {
+    console.log('hi')
+    const $warning = (` <div class="alert alert-success alert-dismissible">
+  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  <strong>Success!</strong> Indicates a successful or positive action.
+</div>`)
+    $('#edit-user-form').append($warning)
+  $('#edit-user-form button[type="submit"]').attr('disabled', true)
+
+  } -->
