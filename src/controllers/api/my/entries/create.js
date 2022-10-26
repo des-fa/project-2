@@ -9,7 +9,7 @@ const createSchema = yup.object({
   gratitude: yup.string().required(),
   // using array of objects
   activities: yup.array().of(yup.object({
-    activity: yup.string().transform((value) => value.toUpperCase()).required()
+    activity: yup.string().transform((value) => value.toUpperCase()).required().min(1)
   })).required(),
   // using array of strings
   // activities: yup.array().of(yup.string().required()),

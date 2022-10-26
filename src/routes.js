@@ -50,7 +50,7 @@ router.get('/my/entries', authenticateUser('html'), (await import('./controllers
 
 // PAGES | PUBLIC POSTS | AUTH REQUIRED
 router.get('/public-posts', (await import('./controllers/pages/public-posts/index.js')).default)
-// router.get('/public-posts/:id', (await import('./controllers/pages/public-posts/show.js')).default)
+router.get('/public-posts/:id', (await import('./controllers/pages/public-posts/show.js')).default)
 
 // PAGES | NOT FOUND
 router.use((await import('./controllers/pages/not-found.js')).default)

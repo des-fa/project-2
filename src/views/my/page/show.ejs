@@ -59,9 +59,10 @@ const generateCreateEntryBtn = () => {
 }
 
 const generateEntryForm = ({ entry, errors } = {}) => {
-  // catch errors, invalid feedback
+  // console.log(entry?.activities) NEED TO ADD ERRORS FOR ACTIVITIES
   const $form = $(`
     <form id="entry-form" class="daily-entry-form">
+
       <div class="row g-3">
         <div class="col-md-12">
           <h3>Today:</h3>
@@ -74,52 +75,70 @@ const generateEntryForm = ({ entry, errors } = {}) => {
         </div>
         <div class="col-4">
           <div id="moodOptions" class="input-group">
-            <select class="form-select" name="mood">
-              <option selected>Choose...</option>
-              <option value="rad">Rad</option>
-              <option value="good">Good</option>
-              <option value="meh">Meh</option>
-              <option value="bad">Bad</option>
-              <option value="awful">Awful</option>
+            <select class="form-select ${errors?.mood && 'is-invalid'}" name="mood">
+              <option value="choose" selected>Choose...</option>
+              <option ${entry?.mood === 'rad' ? 'selected' : ''} value="rad">Rad</option>
+              <option ${entry?.mood === 'good' ? 'selected' : ''} value="good">Good</option>
+              <option ${entry?.mood === 'meh' ? 'selected' : ''} value="meh">Meh</option>
+              <option ${entry?.mood === 'bad' ? 'selected' : ''} value="bad">Bad</option>
+              <option ${entry?.mood === 'awful' ? 'selected' : ''} value="awful">Awful</option>
             </select>
+            <div class="invalid-feedback">${errors?.mood || ''}</div>
           </div>
         </div>
 
         <div class="w-100"></div>
 
         <div class="col-6">
-          <ul  id="activityOptions" class="list-group">
+          <ul id="activityOptions" class="list-group">
+
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="social" name="activities[][activity]" id="social">
-              <label class="form-check-label" for="social">Social Time</  label>
+              <input
+              class="activityOption form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+              type="checkbox"
+              value="social"
+              id="social"
+              ></input>
+              <label class="form-check-label" for="social">Social Time</label>
             </li>
+
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="alone" name="activities[][activity]" id="alone">
+              <input class="activityOption form-check-input me-1" type="checkbox" value="alone" id="alone">
               <label class="form-check-label" for="alone">Alone Time</label>
             </li>
+
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="exercise" name="activity[]" id="exercise">
+              <input class="activityOption form-check-input me-1" type="checkbox" value="exercise" id="exercise">
               <label class="form-check-label" for="exercise">Exercise</label>
             </li>
 
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="chores" name="activity[]" id="chores">
+              <input class="activityOption form-check-input me-1" type="checkbox" value="chores" id="chores">
               <label class="form-check-label" for="chores">Chores</label>
             </li>
+
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="sleep" name="activity[]" id="sleep">
+              <input class="activityOption form-check-input me-1" type="checkbox" value="sleep" id="sleep">
               <label class="form-check-label" for="sleep">Sleep</label>
             </li>
+
             <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox"  value="eat" name="activity[]" id="eat">
+              <input class="activityOption form-check-input me-1" type="checkbox"  value="eat" id="eat">
               <label class="form-check-label" for="eat">Eat Well</label>
             </li>
+
           </ul>
         </div>
 
         <div class="col-6">
-          <label for="gratitudeSentence" class="form-label">I am grateful   for...</label>
-          <textarea class="form-control" id="gratitudeSentence"   name="gratitude" rows="3"></textarea>
+          <label for="gratitudeSentence" class="form-label">I am grateful for...</label>
+          <textarea
+          class="form-control ${errors?.gratitude && 'is-invalid'}" id="gratitudeSentence"
+          name="gratitude"
+          value="${entry?.gratitude || ''}"
+          rows="3"
+          ></textarea>
+          <div class="invalid-feedback">${errors?.gratitude || ''}</div>
         </div>
       </div>
     </form>
@@ -156,8 +175,10 @@ const generateEntryForm = ({ entry, errors } = {}) => {
         <button id="submit-entry-btn" type="submit" class="btn btn-dark">Submit</button>
       </div>
       </div>
+
     </form>
   `)
+
   $('#pages-my-page-show').append($form)
 }
 
@@ -179,10 +200,12 @@ const getDailyPage = () => {
     generatePage()
   })
 }
+
 const handleAddCreateEntryBtn = (e) => {
   e.preventDefault()
   generateCreateEntryBtn()
 }
+
 const handleCreateEntry = (e) => {
   e.preventDefault()
   $('.create-entry-btn button[type="submit"]').attr('disabled', true)
@@ -194,31 +217,49 @@ const handleCreateEntry = (e) => {
 const handleMoodSelect = (e) => {
   const moodSelection = e.target.value
   // console.log(moodSelection)
-  $('#moodIcon').attr("src", `/images/moods/${moodSelection}.png`)
+  if (moodSelection === 'choose') {
+    $('#moodIcon').attr("src", "/images/moods/emotions.png")
+  } else {
+    $('#moodIcon').attr("src", `/images/moods/${moodSelection}.png`)
+  }
+}
+
+// Need to find better way because this function gets called many times
+const handleActivitySelect = (e) => {
+  let arr = []
+  $('.activityOption:checked').each(function(){
+    arr.push($(this).val())
+  })
+  // console.log(arr)
+  // const activities = arr.map((act) => ({activity: act}))
+  // console.log(activities)
+  return arr
 }
 
 const handleSubmitEntry =  (e) => {
   e.preventDefault()
   $('#submit-entry-btn button[type="submit"]').attr('disabled', true)
 
-const entryData = parseFormData(new FormData($('.daily-entry-form')[0]))
-const postData = parseFormData(new FormData($('.daily-entry-form')[1]))
-const data = []
-data.push(entryData)
-data.push(postData)
-console.log(data)
-//something wrong with activities
-// needs to grab mood, activity, gratitude posts data
+  const activityArray = handleActivitySelect()
+  const activities = activityArray.map((act) => ({activity: act}))
+  // console.log(activities)
 
-//   axios({
-//     method: 'POST',
-//     url: '/api/my/wishlists',
-//     data
-//   }).then((resp) => {
-//     window.location.href = `/my/wishlists/${resp.data.id}`
-//   }).catch((err) => {
-//     generatePage({ wishlist: parseFormData(data), errors: err.response.data })
-//   })
+  const entryData = parseFormData(new FormData($('.daily-entry-form')[0]))
+  const postData = parseFormData(new FormData($('.daily-entry-form')[1]))
+  const data = {...entryData, ...activities, ...postData}
+  // console.log(data)
+
+  axios({
+    method: 'POST',
+    url: '/api/my/entries',
+    data
+  }).then((resp) => {
+    window.location.href = `/my/entries/${resp.data.id}`
+  }).catch((err) => {
+    $('#entry-form').remove()
+    $('#post-form').remove()
+    generateEntryForm({ entry: data, errors: err.response.data })
+  })
 }
 
 $(document).ready(() => {
@@ -227,6 +268,7 @@ getDailyPage()
 $('body').on('click', '.close-modal-btn', handleAddCreateEntryBtn)
 $('body').on('click', '.create-entry-btn', handleCreateEntry)
 $('#pages-my-page-show').on('change', '#moodOptions', handleMoodSelect)
+$('#pages-my-page-show').on('click', '.activityOption', handleActivitySelect)
 $('#pages-my-page-show').on('click', '#submit-entry-btn', handleSubmitEntry)
 
 // event listener for editing deleting

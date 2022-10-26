@@ -1,0 +1,73 @@
+<%- contentFor('styles') %>
+<%- contentFor('scripts') %>
+<script>
+const id = window.location.href.split('/').reverse()[0]
+
+const generateTitle = ({ isLoading, post } = {}) => {
+  if (isLoading) return `<div class="text-center">Loading...</div>`
+  if (!post) return `<h2 class="text-center font-monospace mb-3">Community Post ${id} Not Found! :(</h2>`
+
+  return `<h2 class="text-center font-monospace mb-5">Community Post ${id}</h2>`
+}
+
+const generatePublicPost = ({ isLoading, post } = {}) => {
+  if (isLoading || !post) return ''
+
+  return `
+    <div class="row">
+      <article class="blog-post border border-secondary rounded p-4">
+        <h2 class="blog-post-title fw-bold mb-1">${post.title}</h2>
+        <p class="blog-post-meta">${post.createdAt.substring(0, 10)} by <span class="font-monospace">${post.user.username}</span></p>
+
+        <p>${post.content}</p>
+      </article>
+    </div>
+
+            <div class="row">
+                <form id="comments-form" class="border border-secondary rounded p-4 my-2">
+                    <div class="form-group">
+                        <h4 class="mb-2">Leave a comment</h4>
+                        <label for="message">Message</label>
+                        <textarea name="comment" id=""msg cols="30" rows="3" class="form-control mb-3"></textarea>
+                    </div>
+
+                    <div class="form-group d-flex justify-content-end">
+                        <button type="button" id="post" class="btn btn-outline-dark btn-sm">Post Comment</button>
+                    </div>
+                </form>
+            </div>
+  `
+}
+
+const generatePage = (info) => {
+  const $page = $('#pages-public-posts-show')
+  const $title = generateTitle(info)
+  const $publicPost = generatePublicPost(info)
+
+  $page.html('').append($title).append($publicPost)
+}
+
+const getPublicPost = () => {
+  axios({
+    method: 'GET',
+    url: `/api/public-posts/${id}`
+  }).then((resp) => {
+    generatePage({ post: resp.data })
+  }).catch((err) => {
+    generatePage()
+  })
+}
+
+$(document).ready(() => {
+  generatePage({ isLoading: true })
+  getPublicPost()
+})
+</script>
+<%- contentFor('body') %>
+<div id="pages-public-posts-show" class="container"></div>
+
+<!-- add avatar to post
+add avatar + username to comments
+create comments when submit
+display comments
+edit or delete if it's yours-->
