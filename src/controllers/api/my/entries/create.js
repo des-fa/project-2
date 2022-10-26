@@ -82,7 +82,7 @@ const controllersApiMyEntriesCreate = async (req, res) => {
               }
             },
             tags: {
-              connectOrCreate: verifiedData.post.tags.map((tag) => ({
+              connectOrCreate: verifiedData.post.tags?.map((tag) => ({
                 where: tag,
                 create: tag
               }))

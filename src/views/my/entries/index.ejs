@@ -6,17 +6,11 @@ const generateTitle = () => {
 }
 
 const generateFilter = ({ queries: { mood, postTitle, orderBy, sortBy, checked} = {} } = {}) => {
-  console.log(mood)
-    $('#dynamicSearchItem').html(mood ? `help`: ``)
 
-  // if (orderBy === 'postTitle') {
-  //   $('#postTitleSearchWithErrors').css("display", "")
-
-  // }
-  return `
+  const $form = (`
     <form id="filter-form" class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-3">
 
-      <div id="filterSelection" class="col-12">
+      <div id="filter-selection" class="col-12">
         <div class="input-group">
           <div class="input-group-text">Filter By</div>
           <select class="form-select" name="orderBy" value="${orderBy || ''}">
@@ -27,10 +21,29 @@ const generateFilter = ({ queries: { mood, postTitle, orderBy, sortBy, checked} 
         </div>
       </div>
 
-      <div id="dynamicSearchItem" class="col-12">
+      <div class="col-12">
+        <fieldset id="moodSelection" ${orderBy === 'mood' ? '' : 'disabled'}>
+          <div class="input-group">
+            <label class="input-group-text" for="moodOptions">Options</label>
+            <select class="form-select" name="mood" id="moodOptions" value="${mood || ''}">
+              <option selected value="choose">Choose...</option>
+              <option ${mood === 'rad' ? 'selected' : ''} value="rad">Rad</option>
+              <option ${mood === 'good' ? 'selected' : ''} value="good">Good</option>
+              <option ${mood === 'meh' ? 'selected' : ''} value="meh">Meh</option>
+              <option ${mood === 'bad' ? 'selected' : ''} value="bad">Bad</option>
+              <option ${mood === 'awful' ? 'selected' : ''} value="awful">Awful</option>
+            </select>
+          </div>
+        </fieldset>
       </div>
 
-      <div id="postTitleSearchWithErrors" class="col-12" style="display: none">
+      <div class="col-12">
+        <fieldset id="postTitleSearch" ${orderBy === 'postTitle' ? '' : 'disabled'}>
+        <div class="input-group">
+          <div class="input-group-text">Search</div>
+          <input id="postTitleSearchContent" class="form-control" placeholder="Content" name="postTitle" type="text" value="${postTitle || ''}">
+        </div>
+        </fieldset>
       </div>
 
       <div class="col-12">
@@ -50,21 +63,28 @@ const generateFilter = ({ queries: { mood, postTitle, orderBy, sortBy, checked} 
       <div class="col-12">
         <button id="reset-form" class="btn btn-outline-secondary" type="reset">Reset</button>
       </div>
-<div class="w-100"></div>
-  <div class="form-check form-check-inline">
-  <input class="form-check-input" type="radio" name="checked" id="inlineRadio1" value="all">
-  <label class="form-check-label" for="inlineRadio1">All</label>
-</div>
-<div class="form-check form-check-inline">
-  <input class="form-check-input" type="radio" name="checked" id="inlineRadio2" value="private">
-  <label class="form-check-label" for="inlineRadio2">Private</label>
-</div>
-<div class="form-check form-check-inline">
-  <input class="form-check-input" type="radio" name="checked" id="inlineRadio3" value="public">
-  <label class="form-check-label" for="inlineRadio3">Public</label>
-</div>
+
+      <div class="w-100"></div>
+
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="checked" id="inlineRadio1" value="all">
+        <label class="form-check-label" for="inlineRadio1">All</label>
+      </div>
+
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="checked"       id="inlineRadio2" value="private">
+        <label class="form-check-label" for="inlineRadio2">Private</label>
+      </div>
+
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="checked"       id="inlineRadio3" value="public">
+        <label class="form-check-label" for="inlineRadio3">Public</label>
+      </div>
+
     </form>
-  `
+  `)
+
+  return $form
 }
 
 const generateEntry = (entry) => {
@@ -136,60 +156,42 @@ const generatePage = (info) => {
 
 const handleFilterSelect = (e) => {
   const filterSelection = e.target.value
-  let $dynamicSearchItem = $('#dynamicSearchItem')
-
-  const $moodSelection = (`
-    <div class="input-group">
-      <label class="input-group-text" for="moodOptions">Options</label>
-        <select class="form-select" name="mood" id="moodOptions">
-          <option selected>Choose...</option>
-          <option value="rad">Rad</option>
-          <option value="good">Good</option>
-          <option value="meh">Meh</option>
-          <option value="bad">Bad</option>
-          <option value="awful">Awful</option>
-        </select>
-    </div>
-  `)
-
-  const $postTitleSearch = (`
-    <div class="input-group">
-      <div class="input-group-text">Search</div>
-        <input class="form-control" placeholder="Content" name="postTitle" type="text">
-    </div>
-  `)
+  // console.log(filterSelection)
 
   if (filterSelection === "mood") {
-    $dynamicSearchItem.html('').append($moodSelection)
+    $('#moodSelection').attr('disabled', false)
+    $('#postTitleSearch').attr('disabled', true)
+    $('#postTitleSearchContent').val('')
   }
 
   if (filterSelection === "postTitle") {
-    $dynamicSearchItem.html('').append($postTitleSearch)
+    $('#moodSelection').attr('disabled', true)
+    $('#postTitleSearch').attr('disabled', false)
+    $('#moodOptions').val('choose')
   }
 
   if (filterSelection === "id") {
-    $dynamicSearchItem.html('')
+    $('#moodSelection').attr('disabled', true)
+    $('#postTitleSearch').attr('disabled', true)
+    $('#postTitleSearchContent').val('')
+    $('#moodOptions').val('choose')
   }
 }
 
 const handleFilterSubmit = (e) => {
   e.preventDefault()
-  console.log($('#filter-form')[0])
-    const queries = parseFormData(new FormData($('#filter-form')[0]))
-    console.log(queries)
-    generatePage({ isLoading: true, queries })
-    // $('#dynamicSearchItem').html(queries.mood? `help`: ``)
+  // console.log($('#filter-form')[0])
+  const queries = parseFormData(new FormData($('#filter-form')[0]))
+  console.log(queries)
+  generatePage({ isLoading: true, queries })
 
-
-
-
-    // axios({
-    //   method: 'GET',
-    //   url: '/api/my/entries',
-    //   params: queries
-    // }).then((resp) => {
-    //   generatePage({ entries: resp.data.entries, meta: resp.data.meta, queries })
-    // })
+  axios({
+    method: 'GET',
+    url: '/api/my/entries',
+    params: queries
+  }).then((resp) => {
+    generatePage({ entries: resp.data.entries, meta: resp.data.meta, queries })
+  })
 }
 
 $(document).ready(() => {
@@ -203,7 +205,7 @@ $(document).ready(() => {
   })
 
 // On Filter Selection
-  $('#pages-my-entries-index').on('change', '#filterSelection', handleFilterSelect)
+  $('#pages-my-entries-index').on('change', '#filter-selection', handleFilterSelect)
 
 // On Filter Submit
   $('#pages-my-entries-index').on('click', '#filter-submit-btn', handleFilterSubmit)
@@ -212,21 +214,3 @@ $(document).ready(() => {
 
 <%- contentFor('body') %>
 <div id="pages-my-entries-index" class="container"></div>
-
-<!--
-          <div class="input-group">
-          <label class="input-group-text" for="moodOptions">Options</label>
-          <select class="form-select" name="mood" id="moodOptions" value="${mood || ''}">
-            <option selected>Choose...</option>
-            <option ${mood === 'rad' ? 'selected' : ''} value="rad">Rad</option>
-            <option ${mood === 'good' ? 'selected' : ''} value="good">Good</option>
-            <option ${mood === 'meh' ? 'selected' : ''} value="meh">Meh</option>
-            <option ${mood === 'bad' ? 'selected' : ''} value="bad">Bad</option>
-            <option ${mood === 'awful' ? 'selected' : ''} value="awful">Awful</option>
-          </select>
-        </div> -->
-
-  <!-- <div class="input-group">
-<div class="input-group-text">Search</div>
-<input class="form-control" placeholder="Content" name="postTitle" type="text" value="${postTitle || ''}">
-</div> -->
