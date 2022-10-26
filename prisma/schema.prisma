@@ -46,16 +46,17 @@ model Activity {
 }
 
 model Post {
-  id       Int       @id @default(autoincrement())
-  title    String
-  content  String
-  checked  Boolean   @default(false)
-  user     User?     @relation(fields: [userId], references: [id])
-  userId   Int?
-  entry    Entry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
-  entryId  Int       @unique
-  tags     Tag[]
-  comments Comment[]
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now()) @db.Date
+  title     String
+  content   String
+  checked   Boolean   @default(false)
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    Int?
+  entry     Entry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  entryId   Int       @unique
+  tags      Tag[]
+  comments  Comment[]
 }
 
 model Tag {

@@ -6,8 +6,8 @@ const generateTitle = () => {
 }
 
 const generateFilter = ({ queries: { mood, postTitle, orderBy, sortBy, checked} = {} } = {}) => {
-  console.log(postTitle)
-  const $form = (`
+  // console.log(checked)
+  const $form = $(`
     <form id="filter-form" class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-3">
 
       <div id="filter-selection" class="col-12">
@@ -61,23 +61,23 @@ const generateFilter = ({ queries: { mood, postTitle, orderBy, sortBy, checked} 
       </div>
 
       <div class="col-12">
-        <button id="reset-form" class="btn btn-outline-secondary" type="reset">Reset</button>
+        <button id="reset-form-btn" class="btn btn-outline-secondary" type="reset">Reset</button>
       </div>
 
       <div class="w-100"></div>
 
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="checked" id="inlineRadio1" value="all">
+        <input class="form-check-input" type="radio" name="checked" id="inlineRadio1" value="all" ${checked === 'all' ? 'checked' : ''}>
         <label class="form-check-label" for="inlineRadio1">All</label>
       </div>
 
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="checked"       id="inlineRadio2" value="private">
+        <input class="form-check-input" type="radio" name="checked" id="inlineRadio2" value="private" ${checked === 'private' ? 'checked' : ''}>
         <label class="form-check-label" for="inlineRadio2">Private</label>
       </div>
 
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="checked"       id="inlineRadio3" value="public">
+        <input class="form-check-input" type="radio" name="checked" id="inlineRadio3" value="public" ${checked === 'public' ? 'checked' : ''}>
         <label class="form-check-label" for="inlineRadio3">Public</label>
       </div>
 
@@ -102,7 +102,7 @@ const generateEntry = (entry) => {
   `
 }
 
-const generateEntries = ({ isLoading, entries = []} = {}) => {
+const generateEntries = ({ isLoading, entries = [] } = {}) => {
   if (isLoading) return `<div class="text-center mb-3">Loading...</div>`
   if (entries.length === 0) {
     return `
@@ -120,8 +120,8 @@ const generateEntries = ({ isLoading, entries = []} = {}) => {
   `
 }
 
-const generatePagination = (isLoading, { currentPage, totalPages } = {}) => {
-  if (isLoading || !totalPages || totalPages <= 1) return ''
+const generatePagination = ({ isLoading, meta: { currentPage = 1, totalPages = 1 } = {} } = {}) => {
+  if (isLoading) return ''
 
   let links = ''
 
@@ -182,7 +182,7 @@ const handleFilterSubmit = (e) => {
   e.preventDefault()
   // console.log($('#filter-form')[0])
   const queries = parseFormData(new FormData($('#filter-form')[0]))
-  console.log(queries)
+  // console.log(queries)
   generatePage({ isLoading: true, queries })
 
   axios({
@@ -191,6 +191,39 @@ const handleFilterSubmit = (e) => {
     params: queries
   }).then((resp) => {
     generatePage({ entries: resp.data.entries, meta: resp.data.meta, queries })
+  })
+}
+
+const handleFilterReset = (e) => {
+  e.preventDefault()
+
+  generatePage({ isLoading: true })
+
+  axios({
+    method: 'GET',
+    url: `/api/my/entries`
+  }).then((resp) => {
+    generatePage({ entries: resp.data.entries, meta: resp.data.meta })
+  })
+}
+
+const handlePageChange = (e) => {
+  e.preventDefault()
+  // console.log($('#filter-form')[0])
+
+  const queries = parseFormData(new FormData($('#filter-form')[0]))
+  const page = $(e.target).data('page')
+  generatePage({ isLoading: true, queries })
+
+  axios({
+    method: 'GET',
+    url: '/api/my/entries',
+    params: {
+      ...queries,
+      page
+    }
+  }).then((resp) => {
+      generatePage({ entries: resp.data.entries, meta: resp.data.meta, queries })
   })
 }
 
@@ -209,6 +242,12 @@ $(document).ready(() => {
 
 // On Filter Submit
   $('#pages-my-entries-index').on('click', '#filter-submit-btn', handleFilterSubmit)
+
+// On Filter Reset
+  $('#pages-my-entries-index').on('click', '#reset-form-btn', handleFilterReset)
+
+// On Page Link Click
+  $('#pages-my-entries-index').on('click', '.page-link', handlePageChange)
 })
 </script>
 

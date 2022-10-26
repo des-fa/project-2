@@ -1,6 +1,17 @@
 import prisma from '../../../_helpers/prisma.js'
 import handleErrors from '../../../_helpers/handle-errors.js'
 
+const getMoodValue = (value) => {
+  switch (value) {
+    case 'choose': {
+      return ''
+    }
+    default: {
+      return value
+    }
+  }
+}
+
 const getCheckedValue = (value) => {
   // option1 = 'all'
   // option2 = 'private'
@@ -24,7 +35,7 @@ const controllersApiMyEntriesIndex = async (req, res) => {
     const { session: { user: { id: userId } } } = req
 
     // Filters
-    const mood = req.query.mood || ''
+    const mood = getMoodValue(req.query.mood)
     const postTitle = req.query.postTitle || ''
     const postTag = req.query.postTag || ''
     const orderByRaw = req.query.orderBy || 'id'

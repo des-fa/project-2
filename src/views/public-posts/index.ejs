@@ -1,0 +1,213 @@
+<%- contentFor('styles') %>
+<%- contentFor('scripts') %>
+<script>
+const generateTitle = () => {
+  return '<h1 class="text-center mb-3">Community Posts</h1>'
+}
+
+const generateFilter = ({ queries: { search, orderBy, sortBy} = {} } = {}) => {
+  const $form = $(`
+    <form id="filter-form" class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-3">
+
+      <div id="filter-selection" class="col-12">
+        <div class="input-group">
+          <div class="input-group-text">Filter By</div>
+          <select class="form-select" name="orderBy" value="${orderBy || ''}">
+            <option ${orderBy === 'id' ? 'selected' : ''} value="id">Id</option>
+            <option ${orderBy === 'title' ? 'selected' : ''} value="title">Title</option>
+            <option ${orderBy === 'username' ? 'selected' : ''} value="username">Username</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <fieldset id="postSearch">
+        <div class="input-group">
+          <div class="input-group-text">Search</div>
+          <input id="postSearchContent" class="form-control" placeholder="Content" name="search" type="text" value="${search || ''}" disabled>
+        </div>
+        </fieldset>
+      </div>
+
+      <div class="col-12">
+        <div class="input-group">
+          <div class="input-group-text">Sort By</div>
+          <select class="form-select" name="sortBy">
+            <option ${sortBy === 'asc' ? 'selected' : ''} value="asc">Ascending</option>
+            <option ${sortBy === 'desc' ? 'selected' : ''} value="desc">Descending</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <button id="filter-submit-btn" class="btn btn-dark" type="submit" >Submit</button>
+      </div>
+
+      <div class="col-12">
+        <button id="reset-form-btn" class="btn btn-outline-secondary" type="reset">Reset</button>
+      </div>
+
+    </form>
+  `)
+
+  if (orderBy === 'title' || orderBy === 'username') {
+    $form.find('#postSearchContent').attr('disabled', false)
+  }
+
+  return $form
+}
+
+const generatePost = (post) => {
+  return `
+    <a href="/public-posts/${post.id}" class="list-group-item list-group-item-action d-flex gap-4 py-3" aria-current="true">
+      <div class="d-flex align-items-center">
+        <img src="${post.user.avatar}" alt="avatar" width="32" height="32" class="rounded-circle flex-shrink-0">
+      </div>
+      <div class="d-flex gap-2 w-100 justify-content-between">
+        <div>
+          <h6 class="font-monospace mb-1">${post.user.username}</h6>
+          <h6 class="text-uppercase fw-bold mb-0">${post.title}</h6>
+          <p class="mb-0 opacity-75">${post.content}</p>
+        </div>
+        <small class="opacity-50 text-nowrap">${post.createdAt.substring(0, 10)}</small>
+      </div>
+    </a>
+  `
+}
+
+const generatePosts = ({ isLoading, posts = [] } = {}) => {
+  if (isLoading) return `<div class="text-center mb-3">Loading...</div>`
+  if (posts.length === 0) {
+    return `
+      <h2 class="text-center mb-3">No Public Posts Found! :(</h2>
+      <div class="text-center">
+        <a class="btn btn-dark" href="/my/page">Create a New Shared Post Today</a>
+      </div>
+    `
+  }
+
+  return `
+    <div id="posts-list" class="list-group w-auto">
+      ${posts.map(generatePost).join('')}
+    </div>
+  `
+}
+
+const generatePagination = ({ isLoading, meta: { currentPage = 1, totalPages = 1 } = {} } = {}) => {
+  if (isLoading) return ''
+
+  let links = ''
+
+  if (totalPages > 2 && currentPage > 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="1">First</a></li>`
+  if (currentPage - 1 >= 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}">Prev</a></li>`
+  if (currentPage - 2 >= 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 2}">${currentPage - 2}</a></li>`
+  if (currentPage - 1 >= 1) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}">${currentPage - 1}</a></li>`
+
+  links += `<li class="page-item active"><a class="page-link">${currentPage}</a></li>`
+
+  if (currentPage + 1 <= totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}">${currentPage + 1}</a></li>`
+  if (currentPage + 2 <= totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 2}">${currentPage + 2}</a></li>`
+  if (currentPage + 1 <= totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}">Next</a></li>`
+  if (totalPages > 2 && currentPage < totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">Last</a></li>`
+
+  return `
+    <ul class="pagination justify-content-center mt-3">
+      ${links}
+    </ul>
+  `
+}
+
+const generatePage = (info) => {
+  const $page = $('#pages-public-posts-index')
+  const $title = generateTitle(info)
+  const $filter = generateFilter(info)
+  const $posts = generatePosts(info)
+  const $pagination = generatePagination(info)
+
+  $page.html('').append($title).append($filter).append($posts).append($pagination)
+}
+
+const getPosts = () => {
+  axios({
+    method: 'GET',
+    url: `/api/public-posts`
+  }).then((resp) => {
+    generatePage({ posts: resp.data.posts, meta: resp.data.meta })
+  })
+}
+
+const handleFilterSelect = (e) => {
+  const filterSelection = e.target.value
+  // console.log(filterSelection)
+
+  if (filterSelection === "id") {
+    $('#postSearchContent').attr('disabled', true)
+    $('#postSearchContent').val('')
+  } else {
+    $('#postSearchContent').attr('disabled', false)
+    $('#postSearchContent').val('')
+  }
+}
+
+const handleFilterSubmit = (e) => {
+  e.preventDefault()
+  // console.log($('#filter-form')[0])
+  const queries = parseFormData(new FormData($('#filter-form')[0]))
+  console.log(queries)
+  generatePage({ isLoading: true, queries })
+
+  axios({
+    method: 'GET',
+    url: '/api/public-posts',
+    params: queries
+  }).then((resp) => {
+    generatePage({ posts: resp.data.posts, meta: resp.data.meta, queries })
+  })
+}
+
+const handleFilterReset = (e) => {
+  e.preventDefault()
+  generatePage({ isLoading: true })
+  getPosts()
+}
+
+const handlePageChange = (e) => {
+  e.preventDefault()
+  // console.log($('#filter-form')[0])
+
+  const queries = parseFormData(new FormData($('#filter-form')[0]))
+  const page = $(e.target).data('page')
+  generatePage({ isLoading: true, queries })
+
+  axios({
+    method: 'GET',
+    url: '/api/public-posts',
+    params: {
+      ...queries,
+      page
+    }
+  }).then((resp) => {
+      generatePage({ posts: resp.data.posts, meta: resp.data.meta, queries })
+  })
+}
+
+$(document).ready(() => {
+  generatePage({ isLoading: true })
+  getPosts()
+
+// On Filter Selection
+  $('#pages-public-posts-index').on('change', '#filter-selection', handleFilterSelect)
+
+// On Filter Submit
+  $('#pages-public-posts-index').on('click', '#filter-submit-btn', handleFilterSubmit)
+
+// On Filter Reset
+  $('#pages-public-posts-index').on('click', '#reset-form-btn', handleFilterReset)
+
+// On Page Link Click
+  $('#pages-public-posts-index').on('click', '.page-link', handlePageChange)
+})
+</script>
+
+<%- contentFor('body') %>
+<div id="pages-public-posts-index" class="container"></div>

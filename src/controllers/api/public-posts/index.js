@@ -4,14 +4,15 @@ import handleErrors from '../../_helpers/handle-errors.js'
 const controllersApiPublicPostsIndex = async (req, res) => {
   try {
     // Filters
-    const postTitle = req.query.postTitle || ''
+    const search = req.query.search || ''
     const postTag = req.query.postTag || ''
-    const postUsername = req.query.postUsername || ''
-    const orderBy = req.query.orderBy || 'id'
+    const orderByRaw = req.query.orderBy || 'id'
     const sortBy = req.query.sortBy || 'asc'
+    const postTitle = orderByRaw === 'title' ? search : ''
+    const postUsername = orderByRaw === 'username' ? search : ''
 
     // Pagination
-    const take = 10
+    const take = 5
     const page = Number(req.query.page || '1')
     const skip = (page - 1) * take
 
@@ -58,14 +59,30 @@ const controllersApiPublicPostsIndex = async (req, res) => {
       where.OR = OR
     }
 
+    // Need to change orderBy based on request
+    const getOrderByValue = () => {
+      switch (orderByRaw) {
+        case 'username': {
+          const obj = {
+            user: { username: sortBy }
+          }
+          return obj
+        }
+        default: {
+          const obj = {
+            [orderByRaw]: sortBy
+          }
+          return obj
+        }
+      }
+    }
+
     const totalPosts = await prisma.post.count({ where })
     const foundPosts = await prisma.post.findMany({
       take,
       skip,
       where,
-      orderBy: {
-        [orderBy]: sortBy
-      },
+      orderBy: getOrderByValue(),
       include: {
         user: {
           select: {
