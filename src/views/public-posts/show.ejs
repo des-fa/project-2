@@ -5,7 +5,7 @@ const id = window.location.href.split('/').reverse()[0]
 
 const generateTitle = ({ isLoading, post } = {}) => {
   if (isLoading) return `<div class="text-center">Loading...</div>`
-  if (!post) return `<h2 class="text-center font-monospace mb-3">Community Post ${id} Not Found! :(</h2>`
+  if (!post) return `<h2 class="text-center font-monospace mb-5">Community Post ${id} Not Found! :(</h2>`
 
   return `<h2 class="text-center font-monospace mb-5">Community Post ${id}</h2>`
 }

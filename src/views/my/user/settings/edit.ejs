@@ -1,27 +1,30 @@
 <%- contentFor('styles') %>
 <%- contentFor('scripts') %>
 <script>
+const generateTitle = () => {
+  return '<h2 class="text-left font-monospace mb-5">My Account</h2>'
+}
 
 const generateUser = ({ isLoading, user } = {}) => {
   if (isLoading) return `<div class="text-center">Loading...</div>`
-  if (!user) return `<h1 class="text-center mb-3">User Not Found :(</h1>`
+  if (!user) return `<h2 class="text-left font-monospace mb-5">User Not Found :(</h2>`
 
   return `
-    <div class="w-75">
-      <div class="d-flex justify-content-end">
-        <button id="edit-user-btn" class="btn btn-sm btn-dark me-md-2" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit-user">Edit</button>
+      <div class="w-75">
+        <div class="d-flex justify-content-end">
+          <button id="edit-user-btn" class="btn btn-sm btn-dark me-md-2" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit-user">Edit</button>
+        </div>
       </div>
-    </div>
 
-    <div class="mb-1 row">
-      <div class="col-sm-10">
-        <img id="staticAvatar" src="${user.avatar}" alt="avatar" width="75"  height="auto" class="rounded-circle">
+      <div class="mb-1 row">
+        <div class="col-sm-10">
+          <img id="staticAvatar" src="${user.avatar}" alt="avatar" width="75"  height="auto" class="rounded-circle">
+        </div>
       </div>
-    </div>
 
-    <div class="mb-3 row">
-      <label for="staticAvatar" class="col-sm-2   col-form-label">Avatar</label>
-    </div>
+      <div class="mb-3 row">
+        <label for="staticAvatar" class="col-sm-2   col-form-label">Avatar</label>
+      </div>
 
     <div class="mb-3 row">
       <label for="staticUsername" class="col-sm-2   col-form-label">Username: </label>
@@ -202,9 +205,10 @@ const generateModalForm = ({ user, errors } = {}) => {
 
 const generatePage = (info) => {
   const $page = $('#pages-my-user-settings-edit')
+  const $title = generateTitle(info)
   const $user = generateUser(info)
 
-  $page.html('').append($user)
+  $page.html('').append($title).append($user)
 }
 
 const generateModal = (info) => {

@@ -2,12 +2,12 @@
 <%- contentFor('scripts') %>
 <script>
 const generateTitle = () => {
-  return '<h1 class="text-center mb-3">Community Posts</h1>'
+  return '<h2 class="text-center font-monospace mb-5">Community Posts</h2>'
 }
 
 const generateFilter = ({ queries: { search, orderBy, sortBy} = {} } = {}) => {
   const $form = $(`
-    <form id="filter-form" class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-3">
+    <form id="filter-form" class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-5">
 
       <div id="filter-selection" class="col-12">
         <div class="input-group">
@@ -79,7 +79,7 @@ const generatePosts = ({ isLoading, posts = [] } = {}) => {
   if (isLoading) return `<div class="text-center mb-3">Loading...</div>`
   if (posts.length === 0) {
     return `
-      <h2 class="text-center mb-3">No Public Posts Found! :(</h2>
+      <h2 class="text-center font-monospace mb-5">No Public Posts Found! :(</h2>
       <div class="text-center">
         <a class="btn btn-dark" href="/my/page">Create a New Shared Post Today</a>
       </div>
@@ -111,7 +111,7 @@ const generatePagination = ({ isLoading, meta: { currentPage = 1, totalPages = 1
   if (totalPages > 2 && currentPage < totalPages) links += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">Last</a></li>`
 
   return `
-    <ul class="pagination justify-content-center mt-3">
+    <ul class="pagination justify-content-center my-4">
       ${links}
     </ul>
   `
