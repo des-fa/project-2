@@ -6,7 +6,7 @@ const generateTitle = () => {
 }
 
 const generateFilter = ({ queries: { mood, postTitle, orderBy, sortBy, checked} = {} } = {}) => {
-
+  console.log(postTitle)
   const $form = (`
     <form id="filter-form" class="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-3">
 

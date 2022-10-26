@@ -27,7 +27,7 @@ const controllersApiMyEntriesIndex = async (req, res) => {
     const mood = req.query.mood || ''
     const postTitle = req.query.postTitle || ''
     const postTag = req.query.postTag || ''
-    const orderBy = req.query.orderBy || 'id'
+    const orderByRaw = req.query.orderBy || 'id'
     const sortBy = req.query.sortBy || 'asc'
     const checked = getCheckedValue(req.query.checked)
 
@@ -82,17 +82,34 @@ const controllersApiMyEntriesIndex = async (req, res) => {
       where.OR = OR
     }
 
+    // Need to change orderBy based on request
+    const getOrderByValue = () => {
+      switch (orderByRaw) {
+        case 'postTitle': {
+          const obj = {
+            post: { title: sortBy }
+          }
+          return obj
+        }
+        default: {
+          const obj = {
+            [orderByRaw]: sortBy
+          }
+          return obj
+        }
+      }
+    }
+
     const totalMyEntries = await prisma.entry.count({ where })
     const foundMyEntries = await prisma.entry.findMany({
       take,
       skip,
       where,
-      orderBy: {
-        [orderBy]: sortBy
-      },
+      orderBy: getOrderByValue(),
       include: {
         post: {
           select: {
+            title: true,
             checked: true
           }
         }
