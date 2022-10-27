@@ -3,8 +3,9 @@ import handleErrors from '../../_helpers/handle-errors.js'
 
 const controllersApiPublicPostsShow = async (req, res) => {
   try {
-    const { params: { id } } = req
-    const foundPublicPost = await prisma.post.findUnique({ where: { id: Number(id) },
+    const { params: { id }, session: { user: { id: userId } = {} } = {} } = req
+    const foundPublicPost = await prisma.post.findUnique({
+      where: { id: Number(id) },
       include: {
         user: {
           select: {
@@ -12,20 +13,29 @@ const controllersApiPublicPostsShow = async (req, res) => {
             avatar: true
           }
         },
-        tags: {
-          select: {
-            name: true
-          }
-        },
+        tags: true,
         comments: {
-          select: {
-            id: true,
-            comment: true
+          include: {
+            user: {
+              select: {
+                username: true,
+                avatar: true
+              }
+            }
           }
         }
       },
-      rejectOnNotFound: true })
-    return res.status(200).json(foundPublicPost)
+      rejectOnNotFound: true
+    })
+    const addedField = {
+      ...foundPublicPost,
+      comments: foundPublicPost.comments.map((comment) => ({
+        ...comment,
+        isOwner: comment.userId === userId
+      }))
+    }
+
+    return res.status(200).json(addedField)
   } catch (err) {
     return handleErrors(res, err)
   }

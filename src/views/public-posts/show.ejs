@@ -10,32 +10,88 @@ const generateTitle = ({ isLoading, post } = {}) => {
   return `<h2 class="text-center font-monospace mb-5">Community Post ${id}</h2>`
 }
 
-const generatePublicPost = ({ isLoading, post } = {}) => {
+const generatePublicPost = ({ isLoading, post, errors } = {}) => {
   if (isLoading || !post) return ''
 
   return `
     <div class="row">
-      <article class="blog-post border border-secondary rounded p-4">
+      <article class="blog-post border border-secondary rounded p-4 mb-2">
         <h2 class="blog-post-title fw-bold mb-1">${post.title}</h2>
         <p class="blog-post-meta">${post.createdAt.substring(0, 10)} by <span class="font-monospace">${post.user.username}</span></p>
-
         <p>${post.content}</p>
       </article>
     </div>
 
-            <div class="row">
-                <form id="comments-form" class="border border-secondary rounded p-4 my-2">
-                    <div class="form-group">
-                        <h4 class="mb-2">Leave a comment</h4>
-                        <label for="message">Message</label>
-                        <textarea name="comment" id=""msg cols="30" rows="3" class="form-control mb-3"></textarea>
-                    </div>
+    <div class="row">
+      ${generateCommentForm()}
+    </div>
+  `
+}
 
-                    <div class="form-group d-flex justify-content-end">
-                        <button type="button" id="post" class="btn btn-outline-dark btn-sm">Post Comment</button>
-                    </div>
-                </form>
-            </div>
+const generateCommentForm = ({ isLoading, comment, errors } = {}) => {
+  return `
+    <form id="comments-form" class="border border-secondary rounded p-4 my-2">
+      <div class="form-group">
+        <h4 class="mb-2">Leave a comment</h4>
+        <label for="message">Message</label>
+        <textarea
+          name="comment"
+          id="comment"
+          cols="30"
+          rows="3"
+          value="${comment?.comment || ''}"
+          class="form-control mb-3 ${errors?.comment &&'is-invalid'}"
+        ></textarea>
+        <div class="invalid-feedback">${errors?.comment || ''}</div>
+      </div>
+
+      <div class="form-group d-flex justify-content-end">
+        <button type="submit" id="post-comment-btn" class="btn btn-outline-dark btn-sm">Post Comment</button>
+      </div>
+    </form>
+  `
+}
+
+const generateComment = (comment) => {
+  return `
+    <div class="list-group-item list-group-item-action d-flex gap-1 py-3 flex-column" aria-current="true">
+      <div class="d-flex flex-row gap-4">
+        <div class="d-flex align-items-center">
+          <img src="${comment?.user.avatar}" alt="avatar" width="32" height="32" class="rounded-circle flex-shrink-0">
+        </div>
+        <div class="d-flex gap-2 w-100 justify-content-between">
+          <div>
+            <h6 class="font-monospace mb-2">${comment?.user.username}</h6>
+            <h6 class="fw-semibold mb-0">${comment.comment}</h6>
+          </div>
+          <small class="opacity-50 text-nowrap">${comment?.createdAt.substring(0, 10)}</small>
+        </div>
+      </div>
+
+      ${
+        comment.isOwner ? `
+          <div class="d-flex flex-column align-items-end">
+            <button
+              id="delete-comment-btn"
+              class="btn btn-dark btn-sm"
+              type="button"
+              data-commentId="${comment.id}"
+            >Delete</button>
+          </div>
+        ` : ''
+      }
+    </div>
+  `
+}
+
+const generateComments = ({ isLoading, post: { comments = [] } = {} } = {}) => {
+  if (isLoading || !comments) return ''
+  if(!comments) return ''
+
+  return `
+    <div id="comments-list" class="list-group w-auto py-3">
+      ${comments.map(generateComment).join('')}
+    </div>
   `
 }
 
@@ -43,8 +99,8 @@ const generatePage = (info) => {
   const $page = $('#pages-public-posts-show')
   const $title = generateTitle(info)
   const $publicPost = generatePublicPost(info)
-
-  $page.html('').append($title).append($publicPost)
+  const $comments = generateComments(info)
+  $page.html('').append($title).append($publicPost).append($comments)
 }
 
 const getPublicPost = () => {
@@ -58,16 +114,53 @@ const getPublicPost = () => {
   })
 }
 
+const handleSubmitComment = (e) => {
+  e.preventDefault()
+  $('#comments-form button[type="submit"]').attr('disabled', true)
+
+  const data = parseFormData(new FormData($('#comments-form')[0]))
+  // console.log(data)
+
+  axios({
+    method: 'POST',
+    url: '/api/my/comments',
+    data: {
+      ...data,
+      postId: id
+    }
+  }).then((resp) => {
+    window.location.reload()
+  }).catch((err) => {
+    const $form = generateCommentForm({ comment: data, errors: err.response.data })
+
+    $('#comments-form').replaceWith($form)
+  })
+}
+const handleDeleteComment = (e) => {
+  $(e.currentTarget).attr('disabled', true)
+
+  const commentId = $('#delete-comment-btn').attr("data-commentId")
+  console.log(commentId)
+
+  axios({
+    method: 'DELETE',
+    url: `/api/my/comments/${commentId}`
+  }).then((resp) => {
+    window.location.href = `/public-posts/${id}`
+  })
+}
+
 $(document).ready(() => {
   generatePage({ isLoading: true })
   getPublicPost()
+
+  $('#pages-public-posts-show').on('submit', '#comments-form', handleSubmitComment)
+  $('#pages-public-posts-show').on('click', '#delete-comment-btn', handleDeleteComment)
 })
 </script>
+
 <%- contentFor('body') %>
 <div id="pages-public-posts-show" class="container"></div>
 
-<!-- add avatar to post
-add avatar + username to comments
-create comments when submit
-display comments
-edit or delete if it's yours-->
+<!-- A WAY TO GET POSTID TO PASS TO API:
+<input class="d-none" name="postId" value="${id}"> -->

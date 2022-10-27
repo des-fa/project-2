@@ -11,6 +11,7 @@ const controllersApiMyCommentsCreate = async (req, res) => {
   try {
     const { body, session: { user: { id: userId } } } = req
     // const userId = req.session.user.id
+    console.log(body)
 
     const verifiedData = await createSchema.validate(body, { abortEarly: false, stripUnknown: true })
     const newComment = await prisma.comment.create({

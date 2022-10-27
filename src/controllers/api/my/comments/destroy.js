@@ -1,6 +1,6 @@
+import checkOwnership from './_check-ownership.js'
 import prisma from '../../../_helpers/prisma.js'
 import handleErrors from '../../../_helpers/handle-errors.js'
-import checkOwnership from '../entries/_check-ownership.js'
 
 const controllersApiMyCommentsDestroy = async (req, res) => {
   try {
