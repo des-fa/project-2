@@ -1,3 +1,4 @@
+import checkPublicOrPrivate from './_check-ownership.js'
 import prisma from '../../_helpers/prisma.js'
 import handleErrors from '../../_helpers/handle-errors.js'
 
@@ -41,4 +42,7 @@ const controllersApiPublicPostsShow = async (req, res) => {
   }
 }
 
-export default controllersApiPublicPostsShow
+export default [
+  checkPublicOrPrivate,
+  controllersApiPublicPostsShow
+]

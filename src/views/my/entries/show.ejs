@@ -21,13 +21,12 @@ const generateActivity = (activity) => {
 
 const generateEntry = ({ isLoading, entry, errors } = {}) => {
   if (isLoading || !entry) return ''
+
   const mood = entry?.mood || ''
   const activities = entry?.activities || []
   const post = entry?.post || ''
   const checkedPost = entry?.post?.checked || ''
   const pubOrPriv = checkedPost === true ? "PUBLIC" : "PRIVATE"
-  // const showOrHide = pubOrPriv === "PUBLIC"? visible:
-  console.log(checkedPost)
 
   return `
     <div class="d-flex flex-column align-items-center">

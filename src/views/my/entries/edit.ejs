@@ -12,156 +12,145 @@ const generateTitle = ({ isLoading, entry } = {}) => {
 
 const generateForm = ({ isLoading, entry, errors } = {}) => {
   if (isLoading || !entry) return ''
+  const activities = entry?.activities || []
+  const activitiesArrStr = activities.map((activity) => activity.activity.toLowerCase())
 
   return `
-      <form id="entry-form" class="daily-entry-form">
-      <div class="row g-3">
-        <div class="col-md-12">
-          <h3>Today:</h3>
-        </div>
-      </div>
+    <div class="d-flex flex-column align-items-center">
+      <div class="d-flex flex-row justify-content-center border border-secondary rounded p-5 mb-3" style="width: 750px; height: auto;">
+        <form id="daily-entry-form">
+          <div class="d-flex flex-row gap-5 align-items-center">
+            <div class="d-flex flex-column gap-1 justify-content-center">
+              <div class="d-flex flex-row gap-4 mb-1">
+                <img id="mood-icon" src="/images/moods/emotions.png" alt="emotions" width="50"  height="50" class="rounded-4">
 
-      <div class="row g-3">
-        <div class="col-1">
-          <img id="moodIcon" src="/images/moods/emotions.png" alt="emotions" width="50"  height="auto" class="rounded-4">
-        </div>
-        <div class="col-4">
-          <div id="moodOptions" class="input-group">
-            <select class="form-select ${errors?.mood && 'is-invalid'}" name="mood">
-              <option value="">Choose...</option>
-              <option ${entry?.mood === 'rad' ? 'selected' : ''} value="rad">Rad</option>
-              <option ${entry?.mood === 'good' ? 'selected' : ''} value="good">Good</option>
-              <option ${entry?.mood === 'meh' ? 'selected' : ''} value="meh">Meh</option>
-              <option ${entry?.mood === 'bad' ? 'selected' : ''} value="bad">Bad</option>
-              <option ${entry?.mood === 'awful' ? 'selected' : ''} value="awful">Awful</option>
-            </select>
-            <div class="invalid-feedback">${errors?.mood || ''}</div>
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="mood-options">Options</label>
+                  <select id="mood-options" class="form-select ${errors?.mood && 'is-invalid'}" name="mood">
+                    <option value="">Choose...</option>
+                    <option ${entry?.mood === 'rad' ? 'selected' : ''} value="rad">Rad</option>
+                    <option ${entry?.mood === 'good' ? 'selected' : ''} value="good">Good</option>
+                    <option ${entry?.mood === 'meh' ? 'selected' : ''} value="meh">Meh</option>
+                    <option ${entry?.mood === 'bad' ? 'selected' : ''} value="bad">Bad</option>
+                    <option ${entry?.mood === 'awful' ? 'selected' : ''} value="awful">Awful</option>
+                  </select>
+                  <div class="invalid-feedback">${errors?.mood || ''}</div>
+                </div>
+              </div>
+
+              <label for="gratitude-sentence" class="form-label">I am grateful for...</label>
+              <textarea
+                class="mt-2 form-control ${errors?.gratitude && 'is-invalid'}" id="gratitude-sentence"
+                name="gratitude"
+                rows="5"
+              >${entry?.gratitude || ''}</textarea>
+              <div class="invalid-feedback">${errors?.gratitude || ''}</div>
+            </div>
+
+            <div style="width: 200px; height: auto;">
+              <ul class="list-group">
+                <li class="list-group-item">
+                  <input
+                    class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                    type="checkbox"
+                    name="activities[0][activity]"
+                    id="social"
+                    value="social"
+                    ${activitiesArrStr.includes('social') ? 'checked' : ''}
+                  ></input>
+                  <label class="form-check-label" for="activities[0][activity]">Social Time</label>
+                </li>
+
+                <li class="list-group-item">
+                  <input
+                    class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                    type="checkbox"
+                    name="activities[1][activity]"
+                    id="alone"
+                    value="alone"
+                    ${activitiesArrStr.includes('alone') ? 'checked' : ''}
+                  >
+                  <label class="form-check-label" for="activities[1][activity]">Alone Time</label>
+                </li>
+
+                <li class="list-group-item">
+                  <input
+                    class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                    type="checkbox"
+                    name="activities[2][activity]"
+                    id="exercise"
+                    value="exercise"
+                    ${activitiesArrStr.includes('exercise') ? 'checked' : ''}
+                  >
+                  <label class="form-check-label" for="activities[2][activity]">Exercise</label>
+                </li>
+
+                <li class="list-group-item">
+                  <input
+                    class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                    type="checkbox"
+                    name="activities[3][activity]"
+                    id="chores"
+                    value="chores"
+                    ${activitiesArrStr.includes('chores') ? 'checked' : ''}
+                  >
+                  <label class="form-check-label" for="activities[3][activity]">Chores</label>
+                </li>
+
+                <li class="list-group-item">
+                  <input
+                    class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                    type="checkbox"
+                    name="activities[4][activity]"
+                    id="sleep"
+                    value="sleep"
+                    ${activitiesArrStr.includes('sleep') ? 'checked' : ''}
+                  >
+                  <label class="form-check-label" for="activities[4][activity]">Sleep</label>
+                </li>
+
+                <li class="list-group-item">
+                  <input
+                    class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                    type="checkbox"
+                    name="activities[5][activity]"
+                    id="eat"
+                    value="eat"
+                    ${activitiesArrStr.includes('eat') ? 'checked' : ''}
+                  >
+                  <label class="form-check-label" for="activities[5][activity]">Eat Well</label>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
 
-        <div class="w-100"></div>
+          <div class="d-flex flex-column w-75 gap-1 mt-5">
+            <h3 class="fw-semibold mb-3">Post</h3>
+            <label for="post-title" class="form-label">Title</label>
+            <input type="text" class="form-control mb-2 ${errors?.post?.title && 'is-invalid'}" name="title" id="post-title" value=${entry?.post?.title || ''}></input>
+            <div class="invalid-feedback">${errors?.post?.title || ''}</div>
 
-        <div class="col-6">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <input
-                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
-                type="checkbox"
-                name="activities[0][activity]"
-                id="social"
-                value="social"
-                ${activitiesArrStr.includes('social') ? 'checked' : ''}
-              ></input>
-              <label class="form-check-label" for="activities[0][activity]">Social Time</label>
-            </li>
+            <label for="post-content" class="form-label">Content</label>
+            <textarea class="form-control mt-2 ${errors?.post?.content && 'is-invalid'}" name="content" id="post-content" rows="5">${entry?.post?.content || ''}</textarea>
+            <div class="invalid-feedback">${errors?.post?.content || ''}</div>
 
-            <li class="list-group-item">
-              <input
-                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
-                type="checkbox"
-                name="activities[1][activity]"
-                id="alone"
-                value="alone"
-                ${activitiesArrStr.includes('alone') ? 'checked' : ''}
-              >
-              <label class="form-check-label" for="activities[1][activity]">Alone Time</label>
-            </li>
-
-            <li class="list-group-item">
-              <input
-                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
-                type="checkbox"
-                name="activities[2][activity]"
-                id="exercise"
-                value="exercise"
-                ${activitiesArrStr.includes('exercise') ? 'checked' : ''}
-              >
-              <label class="form-check-label" for="activities[2][activity]">Exercise</label>
-            </li>
-
-            <li class="list-group-item">
-              <input
-                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
-                type="checkbox"
-                name="activities[3][activity]"
-                id="chores"
-                value="chores"
-                ${activitiesArrStr.includes('chores') ? 'checked' : ''}
-              >
-              <label class="form-check-label" for="activities[3][activity]">Chores</label>
-            </li>
-
-            <li class="list-group-item">
-              <input
-                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
-                type="checkbox"
-                name="activities[4][activity]"
-                id="sleep"
-                value="sleep"
-                ${activitiesArrStr.includes('sleep') ? 'checked' : ''}
-              >
-              <label class="form-check-label" for="activities[4][activity]">Sleep</label>
-            </li>
-
-            <li class="list-group-item">
-              <input
-                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
-                type="checkbox"
-                name="activities[5][activity]"
-                id="eat"
-                value="eat"
-                ${activitiesArrStr.includes('eat') ? 'checked' : ''}
-              >
-              <label class="form-check-label" for="activities[5][activity]">Eat Well</label>
-            </li>
-          </ul>
-        </div>
-
-        <div class="col-6">
-          <label for="gratitudeSentence" class="form-label">I am grateful for...</label>
-          <textarea
-          class="form-control ${errors?.gratitude && 'is-invalid'}" id="gratitudeSentence"
-          name="gratitude"
-          value="${entry?.gratitude || ''}"
-          rows="3"
-          ></textarea>
-          <div class="invalid-feedback">${errors?.gratitude || ''}</div>
-        </div>
-      </div>
-
-      <div class="row g-3">
-        <div class="col-md-12">
-          <h5>Post (Optional)</h5>
-        </div>
-      </div>
-
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label for="postTitle" class="form-label">Title</label>
-          <input type="text" class="form-control" name="title" id="postTitle"
-        </div>
-
-        <div class="col-6">
-          <label for="postContent" class="form-label">Content</label>
-          <textarea class="form-control" name="content" id="postContent"  rows="3"></textarea>
-        </div>
-
-        <div class="w-100"></div>
-
-        <div class="row g-3">
-        <div class="col-12">
-          <div class="form-check">
-            <input class="form-check-input" name="checked" type="checkbox" id="gridCheck1">
-            <label class="form-check-label" for="gridCheck1">
-              Public
-            </label>
+            <div class="form-check mt-2">
+              <label class="form-check-label" for="post-checkbox">
+                Public
+              </label>
+              <input class="form-check-input" name="checked" type="checkbox" id="post-checkbox" ${entry?.post?.checked ? 'checked' : ''}>
+            </div>
           </div>
-        </div>
-        <div class="col-12">
-          <button id="submit-entry-btn" type="submit" class="btn btn-dark">Submit</button>
-        </div>
+          <div class="d-flex flex-row justify-content-end mt-2">
+            <button
+              id="submit-form-btn"
+              class="btn btn-dark btn-sm"
+              type="submit"
+            >Save Changes</button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   `
 
 }
@@ -185,11 +174,28 @@ const getEntry= () => {
   })
 }
 
+const handleSubmit = (e) => {
+  e.preventDefault()
+  const data = new FormData(e.currentTarget)
+  $('#daily-entry-form button[type="submit"]').attr('disabled', true)
+
+  axios({
+    method: 'PUT',
+    url: `/api/my/entries/${id}`,
+    data
+  }).then((resp) => {
+    window.location.href = `/my/entries/${resp.data.id}`
+  }).catch((err) => {
+    console.log(err)
+    generatePage({ entry: parseFormData(data), errors: err.response.data })
+  })
+}
+
 $(document).ready(() => {
   generatePage({ isLoading: true })
   getEntry()
 
-  // $('#pages-my-entries-edit').on('submit', '#wishlist-edit-form', handleSubmit)
+  $('#pages-my-entries-edit').on('submit', '#daily-entry-form', handleSubmit)
 })
 </script>
 
