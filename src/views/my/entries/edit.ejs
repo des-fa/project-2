@@ -127,18 +127,18 @@ const generateForm = ({ isLoading, entry, errors } = {}) => {
           <div class="d-flex flex-column w-75 gap-1 mt-5">
             <h3 class="fw-semibold mb-3">Post</h3>
             <label for="post-title" class="form-label">Title</label>
-            <input type="text" class="form-control mb-2 ${errors?.post?.title && 'is-invalid'}" name="title" id="post-title" value=${entry?.post?.title || ''}></input>
+            <input type="text" class="post-form-input form-control mb-2 ${errors?.post?.title && 'is-invalid'}" name="post[title]" id="post-title" value=${entry?.title || ''}></input>
             <div class="invalid-feedback">${errors?.post?.title || ''}</div>
 
             <label for="post-content" class="form-label">Content</label>
-            <textarea class="form-control mt-2 ${errors?.post?.content && 'is-invalid'}" name="content" id="post-content" rows="5">${entry?.post?.content || ''}</textarea>
+            <textarea class="post-form-input form-control mt-2 ${errors?.post?.content && 'is-invalid'}" name="post[content]" id="post-content" rows="5">${entry?.content || ''}</textarea>
             <div class="invalid-feedback">${errors?.post?.content || ''}</div>
 
             <div class="form-check mt-2">
               <label class="form-check-label" for="post-checkbox">
                 Public
               </label>
-              <input class="form-check-input" name="checked" type="checkbox" id="post-checkbox" ${entry?.post?.checked ? 'checked' : ''}>
+              <input class="post-form-input form-check-input" name="post[checked]" type="checkbox" id="post-checkbox" ${entry?.checked ? 'checked' : ''}>
             </div>
           </div>
           <div class="d-flex flex-row justify-content-end mt-2">
@@ -176,8 +176,19 @@ const getEntry= () => {
 
 const handleSubmit = (e) => {
   e.preventDefault()
-  const data = new FormData(e.currentTarget)
+  // console.log(e.currentTarget)
+  const data = parseFormData(new FormData(e.currentTarget))
   $('#daily-entry-form button[type="submit"]').attr('disabled', true)
+
+  const postForm = () => {
+    if (!data.post.title && !data.post.content && !data.post.checked) {
+    return ($('.post-form-input').attr('disabled', true))
+  } else {
+    return ($('.post-form-input').attr('disabled', false))
+  }
+  }
+
+
 
   axios({
     method: 'PUT',
@@ -187,7 +198,7 @@ const handleSubmit = (e) => {
     window.location.href = `/my/entries/${resp.data.id}`
   }).catch((err) => {
     console.log(err)
-    generatePage({ entry: parseFormData(data), errors: err.response.data })
+    generatePage({ entry: data, errors: err.response.data })
   })
 }
 

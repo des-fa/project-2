@@ -3,12 +3,21 @@
 <script>
 const generateQuote = ({ isLoading, dailyPage } ={}) => {
   if (isLoading) return `<div class="text-center">Loading...</div>`
-
+    // <h5 class="display-6 fst-italic">${dailyPage.quote.content}</h5>
+    // <p class="lead mt-4 mb-3">${dailyPage.quote.author}</p>
   return`
-  <div class="p-4 p-md-5 mb-4 mx-2 rounded text-bg-dark">
-    <div class="col-md-6 px-0">
-      <h5 class="display-6 fst-italic">${dailyPage.quote.content}</h5>
-      <p class="lead mt-4 mb-3">${dailyPage.quote.author}</p>
+  <div class="row justify-content-center">
+    <div class="p-4 p-md-5 mb-4 mx-2 rounded text-bg-dark" style="width: 1000px; height: auto;">
+      <div class="col-md-6 px-0">
+        <figure class="text-start">
+          <blockquote class="blockquote">
+            <h4 class="fst-italic lh-base">${dailyPage.quote.content}</h4>
+          </blockquote>
+          <figcaption class="text-muted lead">
+            ${dailyPage.quote.author}
+          </figcaption>
+        </figure>
+      </div>
     </div>
   </div>
   `
@@ -58,15 +67,15 @@ const generateCreateEntryBtn = () => {
   $('#pages-my-page-show').append($btn)
 }
 
-const generateEntryForm = ({ entry, errors } = {}) => {
+const generateEntryForm = ({ entry, errors} = {}) => {
   const activities = entry?.activities || []
   const activitiesArrStr = activities.map((activity) => activity.activity)
-// h3 for today
+
   const $form = $(`
     <form id="daily-entry-form">
       <div class="d-flex flex-column align-items-center p-5">
         <div class="d-flex flex-column justify-content-center align-items-center border border-secondary rounded p-5 mb-3" style="width: 750px; height: auto;">
-                      <h3 class="fw-semibold mb-5">Today's Entry</span></h3>
+          <h3 class="fw-semibold mb-5">Today's Entry</span></h3>
           <div class="d-flex flex-row gap-5 align-items-center">
             <div class="d-flex flex-column gap-1 justify-content-center">
               <div class="d-flex flex-row gap-4 mb-1">
@@ -172,30 +181,51 @@ const generateEntryForm = ({ entry, errors } = {}) => {
             </div>
           </div>
           <div class="w-100"></div>
-          <div class="d-flex flex-column w-75 gap-1 mt-5">
-            <h3 class="fw-semibold mb-3">Post <span class="fw-light text-muted fs-4">(Optional)</span></h3>
-            <label for="post-title" class="form-label">Title</label>
-            <input type="text" class="form-control mb-2 ${errors?.post?.title && 'is-invalid'}" name="post[title]" id="post-title" value=${entry?.title || ''}></input>
-            <div class="invalid-feedback">${errors?.post?.title || ''}</div>
 
-            <label for="post-content" class="form-label">Content</label>
-            <textarea class="form-control mt-2 ${errors?.post?.content && 'is-invalid'}" name="post[content]" id="post-content" rows="5">${entry?.content || ''}</textarea>
-            <div class="invalid-feedback">${errors?.post?.content || ''}</div>
+          <div id="post-form-box" class="w-100 collapse">
+            <div class="d-flex justify-content-center">
+              <div class="d-flex flex-column w-75 gap-1 mt-5">
+                <h3 class="fw-semibold mb-3">Post <span class="fw-light text-muted fs-4">(Optional)</span></h3>
+                <label for="post-title" class="form-label">Title</label>
+                <input disabled type="text" class="post-form-input form-control mb-2 ${errors?.post?.title && 'is-invalid'}" name="post[title]" id="post-title" value=${entry?.title || ''}
+                ></input>
+                <div class="invalid-feedback">${errors?.post?.title || ''}</div>
 
-            <div class="form-check mt-2">
-              <label class="form-check-label" for="post-checkbox">
-                Public
-              </label>
-              <input class="form-check-input" name="post[checked]" type="checkbox" id="post-checkbox" ${entry?.checked ? 'checked' : ''}>
+                <label for="post-content" class="form-label">Content</label>
+                <textarea class="post-form-input form-control mt-2 ${errors?.post?.content && 'is-invalid'}" name="post[content]" id="post-content" rows="5" disabled
+                >${entry?.content || ''}</textarea>
+                <div class="invalid-feedback">${errors?.post?.content || ''}</div>
+
+                <div class="form-check mt-2">
+                  <label class="form-check-label" for="post-checkbox">
+                    Public
+                  </label>
+                  <input class="post-form-input form-check-input" name="post[checked]" type="checkbox" id="post-checkbox" ${entry?.checked ? 'checked' : ''} disabled>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="d-flex flex-row justify-content-end mt-2">
-            <button
-              id="submit-entry-btn"
-              class="btn btn-dark btn-sm"
-              type="submit"
-            >Create</button>
+
+          <div class="d-flex flex-row align-self-end gap-2 mt-4 me-5">
+            <div>
+              <button
+                class="btn btn-primary btn-dark btn-sm"
+                id="post-form-btn"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#post-form-box"
+                aria-expanded="false"
+              >Add a Post</button>
+            </div>
+            <div>
+              <button
+                id="submit-entry-btn"
+                class="btn btn-dark btn-sm me-3"
+                type="submit"
+              >Create</button>
+            </div>
           </div>
+
         </div>
       </div>
     </form>
@@ -246,9 +276,24 @@ const handleMoodSelect = (e) => {
   }
 }
 
+const handleHidePostForm = (e) => {
+  // console.log(e.currentTarget)
+  $('.post-form-input').attr('disabled', true)
+  $('#post-form-btn').html('Add a Post')
+}
+
+const handleShowPostForm = (e) => {
+  $('.post-form-input').attr('disabled', false)
+  $('#post-form-btn').html('Cancel Post Creation')
+}
+
 const handleSubmitEntry =  (e) => {
   e.preventDefault()
   $('#submit-entry-btn button[type="submit"]').attr('disabled', true)
+
+  const postFormVisibility = $('#post-form-box').hasClass('show') ? true : false
+
+  // $('#post-form-box').hasClass('show') ? $('#post-form-box').collapse.show : $('#post-form-box').collapse
 
   const data = parseFormData(new FormData($('#daily-entry-form')[0]))
   console.log(data)
@@ -260,7 +305,14 @@ const handleSubmitEntry =  (e) => {
   }).then((resp) => {
     window.location.href = `/my/entries/${resp.data.id}`
   }).catch((err) => {
+    console.log(err)
     const $form = generateEntryForm({ entry: data, errors: err.response.data })
+
+    if (postFormVisibility) {
+      $('#post-form-box').collapse.show
+    } else {
+      $('#post-form-box').collapse
+    }
 
     $('#daily-entry-form').replaceWith($form)
   })
@@ -273,6 +325,8 @@ getDailyPage()
 $('body').on('click', '.close-modal-btn', handleAddCreateEntryBtn)
 $('body').on('click', '.create-entry-btn', handleCreateEntry)
 $('#pages-my-page-show').on('change', '#mood-options', handleMoodSelect)
+$('#pages-my-page-show').on('hidden.bs.collapse', '#post-form-box', handleHidePostForm)
+$('#pages-my-page-show').on('shown.bs.collapse', '#post-form-box', handleShowPostForm)
 $('#pages-my-page-show').on('click', '#submit-entry-btn', handleSubmitEntry)
 })
 </script>

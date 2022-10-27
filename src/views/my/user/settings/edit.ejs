@@ -2,7 +2,7 @@
 <%- contentFor('scripts') %>
 <script>
 const generateTitle = () => {
-  return '<h2 class="text-left font-monospace mb-5">My Account</h2>'
+  return '<h2 class="text-center font-monospace mb-5">My Account</h2>'
 }
 
 const generateUser = ({ isLoading, user } = {}) => {
@@ -10,42 +10,39 @@ const generateUser = ({ isLoading, user } = {}) => {
   if (!user) return `<h2 class="text-left font-monospace mb-5">User Not Found :(</h2>`
 
   return `
-      <div class="w-75">
-        <div class="d-flex justify-content-end">
+    <div class="d-flex flex-row justify-content-center">
+      <div class="d-flex flex-column w-50 border border-secondary rounded p-5 mb-5">
+        <div class="d-flex flex-row justify-content-end">
           <button id="edit-user-btn" class="btn btn-sm btn-dark me-md-2" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit-user">Edit</button>
         </div>
+
+        <div class="mb-1 d-flex flex-column justify-content-center gap-2 w-25">
+            <img id="staticAvatar" src="${user.avatar}" alt="avatar" width="75" height="auto" class="rounded-circle">
+            <label for="staticAvatar" class="form-label ps-3 fw-semibold">Avatar</label>
+        </div>
+
+        <div div class="my-3 row">
+          <label for="staticUsername" class="col-sm-2   col-form-label fw-semibold">Username: </label>
+          <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext"  id="staticUsername" value="${user.username}">
+          </div>
       </div>
 
-      <div class="mb-1 row">
+      <div class="mb-3 row">
+        <label for="staticEmail" class="col-sm-2 col-form-label fw-semibold">Email: </label>
         <div class="col-sm-10">
-          <img id="staticAvatar" src="${user.avatar}" alt="avatar" width="75"  height="auto" class="rounded-circle">
+          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="${user.email}">
         </div>
       </div>
 
       <div class="mb-3 row">
-        <label for="staticAvatar" class="col-sm-2   col-form-label">Avatar</label>
-      </div>
-
-    <div class="mb-3 row">
-      <label for="staticUsername" class="col-sm-2   col-form-label">Username: </label>
-      <div class="col-sm-10">
-        <input type="text" readonly class="form-control-plaintext"  id="staticUsername" value="${user.username}">
+        <label for="staticPassword" class="col-sm-2 col-form-label fw-semibold">Password: </label>
+        <div class="col-sm-10">
+          <input type="text" readonly class="form-control-plaintext" id="staticPassword" value="*****">
+        </div>
       </div>
     </div>
-
-    <div class="mb-3 row">
-      <label for="staticEmail" class="col-sm-2 col-form-label">Email: </label>
-      <div class="col-sm-10">
-        <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="${user.email}">
-      </div>
-    </div>
-
-    <div class="mb-3 row">
-      <label for="staticPassword" class="col-sm-2 col-form-label">Password: </label>
-      <div class="col-sm-10">
-        <input type="text" readonly class="form-control-plaintext" id="staticPassword" value="*****">
-      </div>
-    </div>
+  </div>
 
     <div class="modal fade" id="modal-edit-user" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
