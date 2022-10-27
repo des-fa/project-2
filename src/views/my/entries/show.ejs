@@ -23,10 +23,16 @@ const generateEntry = ({ isLoading, entry, errors } = {}) => {
   if (isLoading || !entry) return ''
   const mood = entry?.mood || ''
   const activities = entry?.activities || []
+  const post = entry?.post || ''
+  const checkedPost = entry?.post?.checked || ''
+  const pubOrPriv = checkedPost === true ? "PUBLIC" : "PRIVATE"
+  // const showOrHide = pubOrPriv === "PUBLIC"? visible:
+  console.log(checkedPost)
 
   return `
-    <div class="d-flex justify-content-center">
-      <div class="border border-secondary rounded p-5 mb-5" style="width: 650px; height: 400px;">
+    <div class="d-flex flex-column align-items-center">
+
+      <div class="border border-secondary rounded p-5 mb-3" style="width: 700px; height: auto;">
         <div class="d-flex flex-row justify-content-end gap-2">
           <button
             id="delete-entry-btn"
@@ -40,23 +46,38 @@ const generateEntry = ({ isLoading, entry, errors } = {}) => {
           >Edit</button>
         </div>
 
-        <div class="d-flex flex-row gap-5 my-2">
-          <div>
+        <div class="d-flex flex-row gap-5 mt-4">
+          <div class="ms-3">
             <img id="moodIcon" src="/images/moods/${mood}.png" alt="emotion" width="80"  height="auto" class="rounded-4">
           </div>
           <div class="d-flex flex-column">
-            <h1 class="text-uppercase fw-bold mb-1">${mood}</h1>
+            <h1 class="font-monospace fw-bold mb-1">${mood}</h1>
             <p>${entry?.createdAt.substring(0, 10)}</p>
-            <div class="d-flex flex-row gap-2 my-2">
+            <div class="d-flex flex-row gap-3 my-2">
             ${activities.map(generateActivity).join('')}
             </div>
+            <h5 class="fst-italic fw-light border rounded px-4 py-3 mt-3">${entry?.gratitude}</h5>
           </div>
         </div>
+      </div>
 
-        <div class="d-flex flex-row justify-content-center mt-4">
-          <h5 class="fst-italic fw-light border rounded p-4 m-2">${entry?.gratitude}</h5>
+      <div class="border border-secondary rounded px-5 py-4 mb-5" style="width: 700px; height: auto;">
+        <div class="d-flex flex-column">
+          <h3 class="fw-semibold mb-2">${post.title}</h3>
+          <h5 class="fw-light my-2">${post.content}</h5>
+          <h6 class="d-flex justify-content-center fw-light border rounded py-2 px-3 mt-2" style="width: 85px; height: auto;">${pubOrPriv}</h6>
+
+          <div class="d-flex flex-row justify-content-end ${pubOrPriv === "PUBLIC"? "visible" : "invisible"}">
+            <button
+              id="comments-btn"
+              class="btn btn-dark btn-sm"
+              type="button"
+              data-id="${post.id}"
+            >Comments</button>
+          </div>
         </div>
       </div>
+
     </div>
   `
 }
@@ -95,12 +116,18 @@ const handleDeleteEntry = (e) => {
   })
 }
 
+const handleCommentsRedirect = (e) => {
+  const id = $(e.currentTarget).data('id')
+  window.location.href = `/public-posts/${id}`
+}
+
 $(document).ready(() => {
   generatePage({ isLoading: true })
   getEntry()
 
   $('#pages-my-entries-show').on('click', '#edit-entry-btn', handleEditEntry)
   $('#pages-my-entries-show').on('click', '#delete-entry-btn', handleDeleteEntry)
+  $('#pages-my-entries-show').on('click', '#comments-btn', handleCommentsRedirect)
 })
 </script>
 

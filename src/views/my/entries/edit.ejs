@@ -1,0 +1,197 @@
+<%- contentFor('styles') %>
+<%- contentFor('scripts') %>
+<script>
+const id = window.location.href.split('/').reverse()[1]
+
+const generateTitle = ({ isLoading, entry } = {}) => {
+  if (isLoading) return `<div class="text-center">Loading...</div>`
+  if (!entry) return `<h2 class="text-center font-monospace mb-5">Entry ${id} Not Found! :(</h2>`
+
+  return `<h2 class="text-center font-monospace mb-5">Edit My Entry no.${id}</h2>`
+}
+
+const generateForm = ({ isLoading, entry, errors } = {}) => {
+  if (isLoading || !entry) return ''
+
+  return `
+      <form id="entry-form" class="daily-entry-form">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <h3>Today:</h3>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-1">
+          <img id="moodIcon" src="/images/moods/emotions.png" alt="emotions" width="50"  height="auto" class="rounded-4">
+        </div>
+        <div class="col-4">
+          <div id="moodOptions" class="input-group">
+            <select class="form-select ${errors?.mood && 'is-invalid'}" name="mood">
+              <option value="">Choose...</option>
+              <option ${entry?.mood === 'rad' ? 'selected' : ''} value="rad">Rad</option>
+              <option ${entry?.mood === 'good' ? 'selected' : ''} value="good">Good</option>
+              <option ${entry?.mood === 'meh' ? 'selected' : ''} value="meh">Meh</option>
+              <option ${entry?.mood === 'bad' ? 'selected' : ''} value="bad">Bad</option>
+              <option ${entry?.mood === 'awful' ? 'selected' : ''} value="awful">Awful</option>
+            </select>
+            <div class="invalid-feedback">${errors?.mood || ''}</div>
+          </div>
+        </div>
+
+        <div class="w-100"></div>
+
+        <div class="col-6">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <input
+                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                type="checkbox"
+                name="activities[0][activity]"
+                id="social"
+                value="social"
+                ${activitiesArrStr.includes('social') ? 'checked' : ''}
+              ></input>
+              <label class="form-check-label" for="activities[0][activity]">Social Time</label>
+            </li>
+
+            <li class="list-group-item">
+              <input
+                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                type="checkbox"
+                name="activities[1][activity]"
+                id="alone"
+                value="alone"
+                ${activitiesArrStr.includes('alone') ? 'checked' : ''}
+              >
+              <label class="form-check-label" for="activities[1][activity]">Alone Time</label>
+            </li>
+
+            <li class="list-group-item">
+              <input
+                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                type="checkbox"
+                name="activities[2][activity]"
+                id="exercise"
+                value="exercise"
+                ${activitiesArrStr.includes('exercise') ? 'checked' : ''}
+              >
+              <label class="form-check-label" for="activities[2][activity]">Exercise</label>
+            </li>
+
+            <li class="list-group-item">
+              <input
+                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                type="checkbox"
+                name="activities[3][activity]"
+                id="chores"
+                value="chores"
+                ${activitiesArrStr.includes('chores') ? 'checked' : ''}
+              >
+              <label class="form-check-label" for="activities[3][activity]">Chores</label>
+            </li>
+
+            <li class="list-group-item">
+              <input
+                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                type="checkbox"
+                name="activities[4][activity]"
+                id="sleep"
+                value="sleep"
+                ${activitiesArrStr.includes('sleep') ? 'checked' : ''}
+              >
+              <label class="form-check-label" for="activities[4][activity]">Sleep</label>
+            </li>
+
+            <li class="list-group-item">
+              <input
+                class="form-check-input me-1 ${errors?.activities && 'is-invalid'}"
+                type="checkbox"
+                name="activities[5][activity]"
+                id="eat"
+                value="eat"
+                ${activitiesArrStr.includes('eat') ? 'checked' : ''}
+              >
+              <label class="form-check-label" for="activities[5][activity]">Eat Well</label>
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-6">
+          <label for="gratitudeSentence" class="form-label">I am grateful for...</label>
+          <textarea
+          class="form-control ${errors?.gratitude && 'is-invalid'}" id="gratitudeSentence"
+          name="gratitude"
+          value="${entry?.gratitude || ''}"
+          rows="3"
+          ></textarea>
+          <div class="invalid-feedback">${errors?.gratitude || ''}</div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-12">
+          <h5>Post (Optional)</h5>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="postTitle" class="form-label">Title</label>
+          <input type="text" class="form-control" name="title" id="postTitle"
+        </div>
+
+        <div class="col-6">
+          <label for="postContent" class="form-label">Content</label>
+          <textarea class="form-control" name="content" id="postContent"  rows="3"></textarea>
+        </div>
+
+        <div class="w-100"></div>
+
+        <div class="row g-3">
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" name="checked" type="checkbox" id="gridCheck1">
+            <label class="form-check-label" for="gridCheck1">
+              Public
+            </label>
+          </div>
+        </div>
+        <div class="col-12">
+          <button id="submit-entry-btn" type="submit" class="btn btn-dark">Submit</button>
+        </div>
+      </div>
+    </form>
+  `
+
+}
+
+const generatePage = (info) => {
+  const $page = $('#pages-my-entries-edit')
+  const $title = generateTitle(info)
+  const $form = generateForm(info)
+
+  $page.html('').append($title).append($form)
+}
+
+const getEntry= () => {
+  axios({
+    method: 'GET',
+    url: `/api/my/entries/${id}`
+  }).then((resp) => {
+    generatePage({ entry: resp.data })
+  }).catch((err) => {
+    generatePage()
+  })
+}
+
+$(document).ready(() => {
+  generatePage({ isLoading: true })
+  getEntry()
+
+  // $('#pages-my-entries-edit').on('submit', '#wishlist-edit-form', handleSubmit)
+})
+</script>
+
+<%- contentFor('body') %>
+<div id="pages-my-entries-edit" class="container"></div>
