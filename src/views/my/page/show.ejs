@@ -11,10 +11,10 @@ const generateQuote = ({ isLoading, dailyPage } ={}) => {
       <div class="col-md-6 px-0">
         <figure class="text-start">
           <blockquote class="blockquote">
-            <h4 class="fst-italic lh-base">${dailyPage.quote.content}</h4>
+            <h4 class="fst-italic lh-base">${dailyPage?.quote?.content}</h4>
           </blockquote>
           <figcaption class="text-muted lead">
-            ${dailyPage.quote.author}
+            ${dailyPage?.quote?.author}
           </figcaption>
         </figure>
       </div>
@@ -23,8 +23,24 @@ const generateQuote = ({ isLoading, dailyPage } ={}) => {
   `
 }
 
-const generateEntry = ({ isLoading, dailyPage } ={}) => {
+const generateActivity = (activity) => {
+  const activityStr = activity?.activity.toLowerCase()
+  // console.log(activityStr)
+
+  return `
+    <img src="/images/activities/${activityStr}.png" alt="activity" width="45" height="auto">
+  `
+}
+
+const generateEntry = ({ isLoading, dailyPage : { entry } = {}} ={}) => {
   if (isLoading) return ''
+
+  const mood = entry?.mood || ''
+  const activities = entry?.activities || []
+  const post = entry?.post || ''
+  const checkedPost = entry?.post?.checked || ''
+  const pubOrPriv = checkedPost === true ? "PUBLIC" : "PRIVATE"
+
   const $modal = $(`
     <div id="entryModal" class="modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
@@ -45,15 +61,59 @@ const generateEntry = ({ isLoading, dailyPage } ={}) => {
     </div>
   `)
 
-  if (!dailyPage.entry) {
+  const $entry = $(`
+    <div class="d-flex flex-column align-items-center">
+
+      <div class="border border-secondary rounded p-5 mb-3" style="width: 700px; height: auto;">
+        <div class="d-flex flex-row justify-content-end gap-3">
+          <button
+            id="delete-entry-btn"
+            class="btn btn-dark btn-sm"
+            type="button"
+          >Delete</button>
+          <button
+            id="edit-entry-btn"
+            class="btn btn-outline-dark btn-sm"
+            type="button"
+          >Edit</button>
+        </div>
+
+        <div class="d-flex flex-row gap-5 mt-4">
+          <div class="ms-3">
+            <img id="moodIcon" src="/images/moods/${mood}.png" alt="emotion" width="80"  height="auto" class="rounded-4">
+          </div>
+          <div class="d-flex flex-column">
+            <h1 class="font-monospace fw-bold mb-1">${mood}</h1>
+            <p>${entry?.createdAt.substring(0, 10)}</p>
+            <div class="d-flex flex-row gap-3 my-2">
+            ${activities.map(generateActivity).join('')}
+            </div>
+            <h5 class="fst-italic fw-light border rounded px-4 py-3 mt-3">${entry?.gratitude}</h5>
+          </div>
+        </div>
+      </div>
+
+      <div class="border border-secondary rounded px-5 py-4 mb-5 ${post ? 'visible' : 'invisible'}" style="width: 700px; height: auto;">
+        <div class="d-flex flex-column">
+          <h3 class="fw-semibold mb-2">${post.title}</h3>
+          <h5 class="fw-light my-2">${post.content}</h5>
+          <h6 class="d-flex justify-content-center fw-light border rounded py-2 px-3 mt-2" style="width: 85px; height: auto;">${pubOrPriv}</h6>
+
+          <div class="d-flex flex-row justify-content-end ${pubOrPriv === "PUBLIC"? "visible" : "invisible"}">
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `)
+
+  if (!entry) {
     $modal.modal({backdrop: 'static', keyboard: false})
     $modal.modal('show')
+  } else {
+    return $entry
   }
-
-  // if successful need to show entry using dailyPage data
-  // show mood, date, mood name, activities, sentence, blog post
-
-  return``
 }
 
 const generateCreateEntryBtn = () => {
@@ -287,7 +347,7 @@ const handleCreateEntry = (e) => {
 const handleMoodSelect = (e) => {
   const moodSelection = e.target.value
   // console.log(moodSelection)
-  if (moodSelection === 'choose') {
+  if (!moodSelection) {
     $('#mood-icon').attr("src", "/images/moods/emotions.png")
   } else {
     $('#mood-icon').attr("src", `/images/moods/${moodSelection}.png`)
@@ -309,8 +369,7 @@ const handleSubmitEntry =  (e) => {
   e.preventDefault()
   $('#submit-entry-btn button[type="submit"]').attr('disabled', true)
 
-  const postFormVisibility = $('#post-form-box').hasClass('show') ? true : false
-
+  // const postFormVisibility = $('#post-form-box').hasClass('show') ? true : false
   // $('#post-form-box').hasClass('show') ? $('#post-form-box').collapse.show : $('#post-form-box').collapse
 
   const data = parseFormData(new FormData($('#daily-entry-form')[0]))
@@ -337,15 +396,15 @@ const handleSubmitEntry =  (e) => {
 }
 
 $(document).ready(() => {
-generatePage({ isLoading: true })
-getDailyPage()
+  generatePage({ isLoading: true })
+  getDailyPage()
 
-$('body').on('click', '.close-modal-btn', handleAddCreateEntryBtn)
-$('body').on('click', '.create-entry-btn', handleCreateEntry)
-$('#pages-my-page-show').on('change', '#mood-options', handleMoodSelect)
-$('#pages-my-page-show').on('hidden.bs.collapse', '#post-form-box', handleHidePostForm)
-$('#pages-my-page-show').on('shown.bs.collapse', '#post-form-box', handleShowPostForm)
-$('#pages-my-page-show').on('click', '#submit-entry-btn', handleSubmitEntry)
+  $('body').on('click', '.close-modal-btn', handleAddCreateEntryBtn)
+  $('body').on('click', '.create-entry-btn', handleCreateEntry)
+  $('#pages-my-page-show').on('change', '#mood-options', handleMoodSelect)
+  $('#pages-my-page-show').on('hidden.bs.collapse', '#post-form-box', handleHidePostForm)
+  $('#pages-my-page-show').on('shown.bs.collapse', '#post-form-box', handleShowPostForm)
+  $('#pages-my-page-show').on('click', '#submit-entry-btn', handleSubmitEntry)
 })
 </script>
 

@@ -30,6 +30,9 @@ const controllersApiMyEntriesUpdate = async (req, res) => {
   try {
     const { params: { id }, body, session: { user: { id: userId } } } = req
     const verifiedData = await updateSchema.validate(body, { abortEarly: false, stripUnknown: true })
+    const foundPost = await prisma.post.findFirst({
+      where: { entryId: Number(id) }
+    })
     const updatedEntry = await prisma.entry.update({
       where: { id: Number(id) },
       data: {
@@ -42,6 +45,7 @@ const controllersApiMyEntriesUpdate = async (req, res) => {
           }))
         },
         post: {
+          delete: !!(!verifiedData.post && foundPost),
           upsert: verifiedData.post ? {
             create: {
               ...verifiedData.post,
@@ -49,34 +53,35 @@ const controllersApiMyEntriesUpdate = async (req, res) => {
                 connect: {
                   id: userId
                 }
-              },
-              tags: {
-                connectOrCreate: verifiedData.post.tags.map((tag) => ({
-                  where: tag,
-                  create: tag
-                }))
               }
+              // tags: {
+              //   connectOrCreate: verifiedData.post.tags.map((tag) => ({
+              //     where: tag,
+              //     create: tag
+              //   }))
+              // }
             },
             update: {
-              ...verifiedData.post,
-              tags: {
-                set: [],
-                connectOrCreate: verifiedData.post.tags.map((tag) => ({
-                  where: tag,
-                  create: tag
-                }))
-              }
+              ...verifiedData.post
+              // tags: {
+              //   set: [],
+              //   connectOrCreate: verifiedData.post.tags.map((tag) => ({
+              //     where: tag,
+              //     create: tag
+              //   }))
+              // }
             }
           } : undefined
         }
       },
       include: {
         activities: true,
-        post: {
-          include: {
-            tags: true
-          }
-        }
+        post: true
+        //   {
+        //   include: {
+        //     tags: true
+        //   }
+        // }
       }
     })
     return res.status(200).json(updatedEntry)

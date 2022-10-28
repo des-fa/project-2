@@ -60,7 +60,7 @@ const generateEntry = ({ isLoading, entry, errors } = {}) => {
         </div>
       </div>
 
-      <div class="border border-secondary rounded px-5 py-4 mb-5" style="width: 700px; height: auto;">
+      <div class="border border-secondary rounded px-5 py-4 mb-5 ${post ? 'visible' : 'invisible'}" style="width: 700px; height: auto;">
         <div class="d-flex flex-column">
           <h3 class="fw-semibold mb-2">${post.title}</h3>
           <h5 class="fw-light my-2">${post.content}</h5>
