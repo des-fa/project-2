@@ -8,13 +8,13 @@ const createSchema = yup.object({
   mood: yup.string().required(),
   gratitude: yup.string().required(),
   // using array of objects
-  activities: yup.array().of(yup.object({
+  activities: yup.array().required().compact((obj) => !obj).of(yup.object({
     activity: yup.string().transform((value) => value.toUpperCase()).required().min(1)
-  })).required(),
+  })),
   // using array of strings
   // activities: yup.array().of(yup.string().required()),
   post: yup.object({
-    title: yup.string().required(),
+    title: yup.string().transform((value) => value.toLowerCase()).required(),
     content: yup.string().required(),
     checked: yup.boolean().transform((value) => (!!value)),
     tags: yup.array().of(

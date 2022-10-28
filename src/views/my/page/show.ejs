@@ -182,25 +182,43 @@ const generateEntryForm = ({ entry, errors} = {}) => {
           </div>
           <div class="w-100"></div>
 
-          <div id="post-form-box" class="w-100 collapse">
+          <div id="post-form-box" class="w-100 collapse ${entry?.post ? 'show' : ''}">
             <div class="d-flex justify-content-center">
               <div class="d-flex flex-column w-75 gap-1 mt-5">
                 <h3 class="fw-semibold mb-3">Post <span class="fw-light text-muted fs-4">(Optional)</span></h3>
                 <label for="post-title" class="form-label">Title</label>
-                <input disabled type="text" class="post-form-input form-control mb-2 ${errors?.post?.title && 'is-invalid'}" name="post[title]" id="post-title" value=${entry?.title || ''}
+                <input
+                  type="text"
+                  class="post-form-input form-control mb-2 ${errors?.post?.title && 'is-invalid'}"
+                  name="post[title]"
+                  id="post-title"
+                  value="${entry?.post?.title || ''}"
+                  ${entry?.post ? '' : 'disabled'}
                 ></input>
                 <div class="invalid-feedback">${errors?.post?.title || ''}</div>
 
                 <label for="post-content" class="form-label">Content</label>
-                <textarea class="post-form-input form-control mt-2 ${errors?.post?.content && 'is-invalid'}" name="post[content]" id="post-content" rows="5" disabled
-                >${entry?.content || ''}</textarea>
+                <textarea
+                  class="post-form-input form-control mt-2 ${errors?.post?.content && 'is-invalid'}"
+                  name="post[content]"
+                  id="post-content"
+                  rows="5"
+                  ${entry?.post ? '' : 'disabled'}
+                >${entry?.post?.content || ''}</textarea>
                 <div class="invalid-feedback">${errors?.post?.content || ''}</div>
 
                 <div class="form-check mt-2">
                   <label class="form-check-label" for="post-checkbox">
                     Public
                   </label>
-                  <input class="post-form-input form-check-input" name="post[checked]" type="checkbox" id="post-checkbox" ${entry?.checked ? 'checked' : ''} disabled>
+                  <input
+                    class="post-form-input form-check-input"
+                    name="post[checked]"
+                    type="checkbox"
+                    id="post-checkbox"
+                    ${entry?.post?.checked ? 'checked' : ''}
+                    ${entry?.post ? '' : 'disabled'}
+                  >
                 </div>
               </div>
             </div>
@@ -215,7 +233,7 @@ const generateEntryForm = ({ entry, errors} = {}) => {
                 data-bs-toggle="collapse"
                 data-bs-target="#post-form-box"
                 aria-expanded="false"
-              >Add a Post</button>
+              >${entry?.post ? 'Cancel Post Creation' : 'Add a Post'}</button>
             </div>
             <div>
               <button
@@ -308,11 +326,11 @@ const handleSubmitEntry =  (e) => {
     console.log(err)
     const $form = generateEntryForm({ entry: data, errors: err.response.data })
 
-    if (postFormVisibility) {
-      $('#post-form-box').collapse.show
-    } else {
-      $('#post-form-box').collapse
-    }
+    // if (postFormVisibility) {
+    //   $('#post-form-box').collapse.show
+    // } else {
+    //   $('#post-form-box').collapse
+    // }
 
     $('#daily-entry-form').replaceWith($form)
   })
